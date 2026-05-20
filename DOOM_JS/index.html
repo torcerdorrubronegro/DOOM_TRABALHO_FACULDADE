@@ -1,0 +1,1243 @@
+<!doctype html>
+<html lang="pt-BR">
+  <head>
+    <meta charset="UTF-8" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1.0, user-scalable=no"
+    />
+    <title>DOOM PORTUGOL - RIP AND TEAR! | Marine vs Inferno</title>
+    <link rel="shortcut icon" href="./img/doom-favicon.jpg" type="image/x-icon">
+    <style>
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+        user-select: none;
+        -webkit-tap-highlight-color: transparent;
+      }
+
+      html,
+      body {
+        width: 100%;
+        height: 100%;
+        overflow: hidden;
+        background: #050608;
+        font-family: "Courier New", monospace;
+      }
+
+      body {
+        padding: 16px;
+        background: linear-gradient(145deg, #0a0c12 0%, #030507 100%);
+      }
+
+      .doom-title {
+        display: flex;
+        width: 100%;
+        height: 100px;
+        justify-content: center;
+        align-items: center;
+        margin-bottom: 8px;
+
+        img {
+          width: 200px;
+          height: 200px;
+        }
+      }
+
+      .game-container {
+        width: 100%;
+        height: 100%;
+        background: #000000cc;
+        border-radius: 24px;
+        border: 1px solid #3e2a1f;
+        padding: 1rem;
+        box-shadow:
+          0 20px 35px rgba(0, 0, 0, 0.7),
+          inset 0 1px 0 rgba(255, 255, 255, 0.05);
+
+        display: flex;
+        flex-direction: column;
+        overflow: hidden;
+      }
+
+      .doom-panel {
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        overflow: hidden;
+
+        background: #0b0e14;
+        border-radius: 18px;
+      }
+
+      .info-bar {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 10px;
+        justify-content: space-between;
+
+        padding: 12px 16px;
+
+        background: #1e1a14e6;
+        border-bottom: 3px solid #b53b1c;
+      }
+
+      .stat {
+        background: #00000099;
+        padding: 6px 12px;
+        border-radius: 20px;
+        border-left: 3px solid #e35f21;
+
+        color: #f0e6a0;
+        font-weight: bold;
+        font-size: 0.95rem;
+      }
+
+      .stat span {
+        color: #ffb347;
+      }
+
+      .controls-tip {
+        background: #000000aa;
+        padding: 6px 12px;
+        border-radius: 20px;
+
+        color: #deb887;
+        font-size: 0.75rem;
+        font-weight: bold;
+      }
+
+      .doomInterface {
+        flex: 1;
+
+        display: flex;
+        overflow: hidden;
+
+        background: #000;
+      }
+
+      /* ================= GAME ================= */
+
+      .game-area {
+        flex: 3;
+
+        display: flex;
+        align-items: center;
+        justify-content: center;
+
+        padding: 1rem;
+
+        background: #0b0907;
+        overflow: hidden;
+      }
+
+      .canvas-wrapper {
+        width: 100%;
+        height: 100%;
+
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
+
+      #doomCanvas {
+        display: block;
+
+        max-width: 100%;
+        max-height: 100%;
+
+        width: auto;
+        height: auto;
+
+        object-fit: contain;
+
+        background: #000;
+
+        image-rendering: pixelated;
+
+        box-shadow:
+          0 0 0 4px #2a1e12,
+          0 0 0 8px #1a120a;
+      }
+
+      /* ================= CONSOLE ================= */
+
+      .console-panel {
+        flex: 1.2;
+
+        display: flex;
+        flex-direction: column;
+
+        background: #010101e6;
+        border-left: 3px solid #6a3e1a;
+
+        min-width: 280px;
+
+        overflow: hidden;
+
+        min-height: 0;
+        /* IMPORTANTE */
+      }
+
+      .console-area {
+        flex: 1;
+        overflow-y: auto;
+        overflow-x: hidden;
+
+        min-height: 0;
+        /* IMPORTANTE */
+
+        padding: 1rem;
+
+        background: #020202cc;
+
+        color: #8bc34a;
+        font-size: 0.8rem;
+        line-height: 1.5;
+
+        border-bottom: 1px solid #3a281a;
+
+        text-shadow: 0 0 2px #1f3a0a;
+
+        word-break: break-word;
+      }
+
+      .console-area::-webkit-scrollbar {
+        width: 6px;
+      }
+
+      .console-area::-webkit-scrollbar-track {
+        background: #1f140c;
+      }
+
+      .console-area::-webkit-scrollbar-thumb {
+        background: #8b5a2b;
+        border-radius: 10px;
+      }
+
+      .weapon-art {
+        display: none;
+
+        width: 90%;
+        max-height: 180px;
+
+        margin: 12px auto;
+
+        object-fit: contain;
+
+        border: 2px solid #ff2a2a;
+        border-radius: 8px;
+
+        background: rgba(0, 0, 0, 0.7);
+
+        box-shadow: 0 0 10px rgba(255, 0, 0, 0.4);
+      }
+
+      .console-actions {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+
+        padding: 1rem;
+
+        background: #030302;
+
+        border-top: 1px solid #7a4a1e;
+      }
+
+      button {
+        background: #2c1d12;
+        color: #ffbc6e;
+
+        border: 1px solid #b87a36;
+
+        padding: 10px 18px;
+
+        border-radius: 30px;
+
+        font-family: monospace;
+        font-weight: bold;
+
+        cursor: pointer;
+
+        transition: 0.15s;
+      }
+
+      button:hover {
+        background: #4d2f1c;
+        color: #ffd894;
+      }
+
+      button:active {
+        transform: translateY(2px);
+      }
+
+      /* ================= FX ================= */
+
+      @keyframes explode {
+        0% {
+          transform: scale(0);
+          opacity: 1;
+        }
+
+        100% {
+          transform: scale(2);
+          opacity: 0;
+        }
+      }
+
+      .explosion-effect {
+        position: absolute;
+
+        width: 60px;
+        height: 60px;
+
+        border-radius: 50%;
+
+        background: radial-gradient(circle, #ff6600, #ff3300, #ff0000);
+
+        pointer-events: none;
+
+        animation: explode 0.5s ease-out forwards;
+
+        z-index: 999;
+      }
+
+      /* ================= MOBILE ================= */
+
+      @media (max-width: 900px) {
+        .doomInterface {
+          flex-direction: column;
+        }
+
+        .console-panel {
+          min-width: unset;
+          height: 40%;
+        }
+
+        .game-area {
+          height: 60%;
+        }
+
+        .info-bar {
+          justify-content: center;
+        }
+
+        .console-area {
+          font-size: 0.72rem;
+        }
+      }
+    </style>
+  </head>
+
+  <body>
+    <div>
+      <div class="doom-title">
+        <img src="./img/doom-titulo.png" alt="">
+      </div>
+      <div class="game-container">
+        <div class="doom-panel">
+          <div class="info-bar">
+            <div class="stat">💀 VIDA: <span id="vidaVal">100</span>%</div>
+            <div class="stat">🔫 SHOTGUN: <span id="municaoVal">20</span></div>
+            <div class="stat">⭐ SCORE: <span id="pontuacaoVal">0</span></div>
+            <div class="stat">👹 ALVOS: <span id="inimigosRest">6</span></div>
+            <div class="controls-tip">
+              🎮 WASD mover | [F] ATIRAR | [Q] SAIR
+            </div>
+          </div>
+          <div class="doomInterface">
+            <!-- COLUNA ESQUERDA: JOGO (canvas) -->
+            <div class="game-area">
+              <div class="canvas-wrapper">
+                <canvas id="doomCanvas" width="600" height="450"></canvas>
+              </div>
+            </div>
+
+            <!-- COLUNA DIREITA: CONSOLE + WEAPON ART + AÇÕES -->
+            <div class="console-panel">
+              <!-- Área de log / mensagens (id mantido para JS) -->
+              <div class="console-area" id="logArea"></div>
+
+              <!-- Painel de arte da arma (dynamic, mesmo id usado no script original) -->
+              <img
+                id="weaponArtPanel"
+                class="weapon-art"
+                src=""
+                alt="weapon visual"
+              />
+
+              <!-- rodapé com botão restart e status BFG -->
+              <div class="console-actions">
+                <button id="resetBtn">🔥 RENASCER (RESTART)</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <script>
+      // ==============================  ESTRUTURA DO JOGO  =================================
+      // Mapa 20x15 (X horizontal, Y vertical)
+      let mapa = Array(21)
+        .fill()
+        .map(() => Array(16).fill(0));
+
+      // Status Marine
+      let jogadorX = 10,
+        jogadorY = 8;
+      let vida = 100,
+        municao = 20,
+        pontuacao = 0;
+
+      // Horda demoníaca (6 inimigos)
+      let inimigoX = new Array(7);
+      let inimigoY = new Array(7);
+      let inimigoVivo = new Array(7);
+      let contadorInimigos = 6;
+
+      let jogoAtivo = true;
+
+      // Controle de interface de tiro (sistema sequencial)
+      let aguardandoArma = false;
+      let aguardandoDirecao = false;
+      let armaSelecionadaTemp = 0;
+      let esperandoInput = false; // trava teclas de movimento enquanto aguarda escolha
+
+      // Elementos DOM
+      const canvas = document.getElementById("doomCanvas");
+      const ctx = canvas.getContext("2d");
+      const vidaSpan = document.getElementById("vidaVal");
+      const municaoSpan = document.getElementById("municaoVal");
+      const pontuacaoSpan = document.getElementById("pontuacaoVal");
+      const inimigosSpan = document.getElementById("inimigosRest");
+      const logArea = document.getElementById("logArea");
+      const weaponArtImg = document.getElementById("weaponArtPanel"); // Agora é uma tag <img>
+      const resetBtn = document.getElementById("resetBtn");
+
+      // células de desenho (tamanho 30x30)
+      const CELL_W = 30;
+      const CELL_H = 30;
+
+      // ----------  ARTE DAS ARMAS (IMAGENS)  ----------
+      const armasArt = {
+        1: "./img/SuperShotgun.png",
+        2: "./img/Chainsaw.png",
+        3: "./img/PlasmaRifle.png",
+        4: "./img/RPG-7.png",
+        5: "./img/BFG-9000.png",
+      };
+
+      // Substitua a função addLog inteira por esta versão
+      function addLog(msg) {
+        const p = document.createElement("div");
+        p.innerHTML = `> ${msg}`;
+        logArea.appendChild(p);
+
+        // Limite de 40 mensagens no DOM para evitar crescimento infinito
+        const MAX_MESSAGES = 6;
+        while (logArea.children.length > MAX_MESSAGES) {
+          logArea.removeChild(logArea.firstChild);
+        }
+
+        // Garante scroll automático para o final
+        logArea.scrollTop = logArea.scrollHeight;
+      }
+
+      function exibirArteArma(armaNum) {
+        if (armasArt[armaNum]) {
+          weaponArtImg.src = armasArt[armaNum];
+          weaponArtImg.style.display = "block";
+          weaponArtImg.style.maxWidth = "100%";
+          weaponArtImg.style.maxHeight = "200px";
+          weaponArtImg.style.objectFit = "contain";
+          addLog(`🎨 Arma ${armaNum} equipada!`);
+        } else {
+          weaponArtImg.style.display = "none";
+          weaponArtImg.src = "";
+        }
+      }
+
+      function limparArte() {
+        weaponArtImg.style.display = "none";
+        weaponArtImg.src = "";
+      }
+
+      // =========================  INICIALIZAÇÃO DO MUNDO ==========================
+      function inicializarJogo() {
+        vida = 100;
+        municao = 20;
+        pontuacao = 0;
+        contadorInimigos = 6;
+        jogoAtivo = true;
+        aguardandoArma = false;
+        aguardandoDirecao = false;
+        esperandoInput = false;
+        armaSelecionadaTemp = 0;
+        resetBtn.style.display = "none";
+        limparArte();
+
+        // 1. Limpar mapa (chão 0)
+        for (let x = 1; x <= 20; x++) {
+          for (let y = 1; y <= 15; y++) {
+            mapa[x][y] = 0;
+          }
+        }
+        // 2. Paredes bordas
+        for (let x = 1; x <= 20; x++) {
+          mapa[x][1] = 1;
+          mapa[x][15] = 1;
+        }
+        for (let y = 1; y <= 15; y++) {
+          mapa[1][y] = 1;
+          mapa[20][y] = 1;
+        }
+        // 3. Obstáculos internos (labirinto)
+        mapa[5][5] = 1;
+        mapa[5][6] = 1;
+        mapa[15][10] = 1;
+        mapa[15][11] = 1;
+
+        // 4. Jogador
+        jogadorX = 10;
+        jogadorY = 8;
+        mapa[jogadorX][jogadorY] = 2;
+
+        // 5. Inimigos hardcoded
+        const posInimigos = [
+          { x: 3, y: 3 },
+          { x: 17, y: 3 },
+          { x: 3, y: 12 },
+          { x: 17, y: 12 },
+          { x: 10, y: 3 },
+          { x: 10, y: 13 },
+        ];
+        for (let i = 1; i <= 6; i++) {
+          inimigoVivo[i] = true;
+          inimigoX[i] = posInimigos[i - 1].x;
+          inimigoY[i] = posInimigos[i - 1].y;
+          mapa[inimigoX[i]][inimigoY[i]] = 3;
+        }
+
+        atualizarUI();
+        desenharMapa();
+      }
+
+      function atualizarUI() {
+        vidaSpan.innerText = vida;
+        municaoSpan.innerText = municao;
+        pontuacaoSpan.innerText = pontuacao;
+        inimigosSpan.innerText = contadorInimigos;
+      }
+
+      // =========================  RENDER CANVAS ESTILO DOOM ==========================
+      function desenharMapa() {
+        if (!jogoAtivo) return;
+        ctx.clearRect(0, 0, 600, 450);
+        for (let y = 1; y <= 15; y++) {
+          for (let x = 1; x <= 20; x++) {
+            let tile = mapa[x][y];
+            let px = (x - 1) * CELL_W;
+            let py = (y - 1) * CELL_H;
+            if (tile === 1) {
+              // parede
+              ctx.fillStyle = "#3c2a23";
+              ctx.fillRect(px, py, CELL_W - 1, CELL_H - 1);
+              ctx.fillStyle = "#5e3e2c";
+              ctx.fillRect(px + 2, py + 2, CELL_W - 5, CELL_H - 5);
+              ctx.fillStyle = "#1f140e";
+              ctx.fillRect(px + 4, py + 4, CELL_W - 9, CELL_H - 9);
+            } else if (tile === 2) {
+              // Marine
+              ctx.fillStyle = "#2c6e2c";
+              ctx.fillRect(px, py, CELL_W - 1, CELL_H - 1);
+              ctx.fillStyle = "#7ac76a";
+              ctx.font = `bold ${CELL_W - 8}px monospace`;
+              ctx.fillText("🪖", px + 4, py + 24);
+            } else if (tile === 3) {
+              // Monstro
+              ctx.fillStyle = "#8b3c2c";
+              ctx.fillRect(px, py, CELL_W - 1, CELL_H - 1);
+              ctx.fillStyle = "#e05a3a";
+              ctx.font = `${CELL_W - 6}px monospace`;
+              ctx.fillText("M", px + 8, py + 24);
+            } else {
+              ctx.fillStyle = "#120e0a";
+              ctx.fillRect(px, py, CELL_W - 1, CELL_H - 1);
+              ctx.fillStyle = "#2f2a1f";
+              ctx.fillRect(px + 1, py + 1, CELL_W - 3, CELL_H - 3);
+            }
+          }
+        }
+        // bordas
+        ctx.strokeStyle = "#b87c4f";
+        ctx.lineWidth = 2;
+        ctx.strokeRect(0, 0, 600, 450);
+      }
+
+      // =========================  MOVIMENTAÇÃO DOS DEMÔNIOS (IA) ==========================
+      function moverDemonios() {
+        if (!jogoAtivo) return;
+        for (let i = 1; i <= 6; i++) {
+          if (!inimigoVivo[i]) continue;
+
+          let dx = 0,
+            dy = 0;
+          if (jogadorX > inimigoX[i]) dx = 1;
+          else if (jogadorX < inimigoX[i]) dx = -1;
+
+          if (jogadorY > inimigoY[i]) dy = 1;
+          else if (jogadorY < inimigoY[i]) dy = -1;
+
+          // aleatório mover X ou Y (rand entre 0 e 1)
+          let randDir = Math.floor(Math.random() * 2);
+          let proxX = inimigoX[i],
+            proxY = inimigoY[i];
+          if (randDir === 0) {
+            proxX = inimigoX[i] + dx;
+            proxY = inimigoY[i];
+          } else {
+            proxX = inimigoX[i];
+            proxY = inimigoY[i] + dy;
+          }
+
+          // limites e colisões
+          if (proxX >= 1 && proxX <= 20 && proxY >= 1 && proxY <= 15) {
+            // Se inimigo encontra o jogador = dano
+            if (proxX === jogadorX && proxY === jogadorY) {
+              vida -= 10;
+              addLog(`💔 Demônio te acertou! Vida: ${vida}`);
+              atualizarUI();
+              if (vida <= 0) {
+                finalizarJogo(false);
+                return;
+              }
+              continue; // não se move, apenas causa dano
+            }
+            // se célula vazia (0) pode mover
+            if (mapa[proxX][proxY] === 0) {
+              // remove antiga posição
+              mapa[inimigoX[i]][inimigoY[i]] = 0;
+              // atualiza coordenadas
+              inimigoX[i] = proxX;
+              inimigoY[i] = proxY;
+              mapa[inimigoX[i]][inimigoY[i]] = 3;
+            } // se for parede ou outro monstro, fica parado
+          }
+        }
+        desenharMapa();
+      }
+
+      // =========================  SISTEMA DE TIRO (HERDADO DO PORTUGOL) ==========================
+      function executarDisparo(direcao) {
+        if (!jogoAtivo) return false;
+        if (municao <= 0) {
+          addLog(
+            "🔇 SEM MUNIÇÃO! Procure matar demônios para ganhar balas (+2 por abate).",
+          );
+          return false;
+        }
+        if (!armaSelecionadaTemp) {
+          addLog("ERRO: nenhuma arma selecionada, tente novamente.");
+          return false;
+        }
+
+        // Gasta munição
+        municao--;
+        let tiroX = jogadorX;
+        let tiroY = jogadorY;
+        let alvoAtingido = false;
+        let dir = direcao.toLowerCase();
+
+        while (
+          tiroX > 1 &&
+          tiroX < 20 &&
+          tiroY > 1 &&
+          tiroY < 15 &&
+          !alvoAtingido
+        ) {
+          if (dir === "w") tiroY--;
+          else if (dir === "s") tiroY++;
+          else if (dir === "a") tiroX--;
+          else if (dir === "d") tiroX++;
+          else break;
+
+          // Parede?
+          if (mapa[tiroX][tiroY] === 1) {
+            addLog(`💥 Tiro acertou uma parede!`);
+            alvoAtingido = true;
+            break;
+          }
+          // Acertou monstro?
+          if (mapa[tiroX][tiroY] === 3) {
+            // encontrar qual inimigo
+            for (let i = 1; i <= 6; i++) {
+              if (
+                inimigoVivo[i] &&
+                inimigoX[i] === tiroX &&
+                inimigoY[i] === tiroY
+              ) {
+                inimigoVivo[i] = false;
+                contadorInimigos--;
+                pontuacao += 100;
+                municao += 2; // recompensa por carnificina
+                mapa[tiroX][tiroY] = 0;
+                addLog(
+                  `🔥 MONSTRO ABATIDO! +100 pontos, +2 munição. Restam ${contadorInimigos} inimigos.`,
+                );
+                atualizarUI();
+                alvoAtingido = true;
+                break;
+              }
+            }
+            break;
+          }
+        }
+        if (!alvoAtingido)
+          addLog(
+            `🔫 Disparo na direção ${direcao.toUpperCase()} ecoou no vazio.`,
+          );
+        atualizarUI();
+
+        // Verifica vitória
+        if (contadorInimigos <= 0) {
+          finalizarJogo(true);
+          return true;
+        }
+        return true;
+      }
+
+      // =========================  FLUXO DE TIRO COM ARTE E ESCOLHA ==========================
+      function iniciarSequenciaTiro() {
+        if (!jogoAtivo) return;
+        if (aguardandoArma || aguardandoDirecao) {
+          addLog(
+            "⏳ Já está em modo de tiro. Escolha arma (1-5) ou cancele com ESC.",
+          );
+          return;
+        }
+        if (municao === 0) {
+          addLog("❌ SEM MUNIÇÃO! Mate demônios para ganhar munição!");
+          return;
+        }
+        aguardandoArma = true;
+        esperandoInput = true;
+        addLog(
+          "🎯 ESCOLHA SUA ARMA: <br> [1] Super Shotgun <br> [2] Chainsaw <br> [3] Plasma <br> [4] RPG-7 <br> [5] BFG-9000",
+        );
+        limparArte();
+      }
+
+      function processarEscolhaArma(teclaNum) {
+        if (!aguardandoArma) return false;
+        let arma = parseInt(teclaNum);
+        if (arma >= 1 && arma <= 5) {
+          armaSelecionadaTemp = arma;
+          exibirArteArma(arma);
+          let nomeArma = "";
+          switch (arma) {
+            case 1:
+              nomeArma = "Super Shotgun";
+              break;
+            case 2:
+              nomeArma = "Chainsaw";
+              break;
+            case 3:
+              nomeArma = "Plasma Rifle";
+              break;
+            case 4:
+              nomeArma = "RPG-7";
+              break;
+            case 5:
+              nomeArma = "BFG-9000";
+              break;
+          }
+          addLog(`🔻 ARMA SELECIONADA: ${nomeArma}. AGORA MIRE (W/A/S/D)`);
+          aguardandoArma = false;
+          aguardandoDirecao = true;
+          return true;
+        } else {
+          addLog("⚠️ Arma inválida. Digite 1 a 5.");
+          return false;
+        }
+      }
+
+      function processarDirecaoTiro(teclaDir) {
+        if (!aguardandoDirecao) return false;
+        let dir = teclaDir.toLowerCase();
+        if (dir === "w" || dir === "a" || dir === "s" || dir === "d") {
+          addLog(
+            `🎯 ATIRANDO para ${dir.toUpperCase()} com a arma ${armaSelecionadaTemp}!`,
+          );
+          executarDisparo(dir);
+          // finaliza modo tiro
+          aguardandoDirecao = false;
+          esperandoInput = false;
+          armaSelecionadaTemp = 0;
+          limparArte();
+          // após tiro, inimigos se movem
+          if (jogoAtivo) {
+            moverDemonios();
+            desenharMapa();
+            if (vida <= 0) finalizarJogo(false);
+            else if (contadorInimigos === 0) finalizarJogo(true);
+          }
+          return true;
+        } else {
+          addLog(
+            "❌ Direção inválida! Use W (cima), A (esq), S (baixo), D (dir) para mirar.",
+          );
+          return false;
+        }
+      }
+
+      function cancelarModoTiro() {
+        if (aguardandoArma || aguardandoDirecao) {
+          addLog("🚫 Modo de tiro cancelado.");
+          aguardandoArma = false;
+          aguardandoDirecao = false;
+          esperandoInput = false;
+          armaSelecionadaTemp = 0;
+          limparArte();
+        }
+      }
+
+      // =========================  MOVIMENTO DO JOGADOR  ==========================
+      function moverJogador(dx, dy) {
+        if (!jogoAtivo) return false;
+        if (esperandoInput) return false;
+        let novoX = jogadorX + dx;
+        let novoY = jogadorY + dy;
+        if (
+          novoX >= 1 &&
+          novoX <= 20 &&
+          novoY >= 1 &&
+          novoY <= 15 &&
+          mapa[novoX][novoY] === 0
+        ) {
+          // limpa posição antiga
+          mapa[jogadorX][jogadorY] = 0;
+          jogadorX = novoX;
+          jogadorY = novoY;
+          mapa[jogadorX][jogadorY] = 2;
+          desenharMapa();
+          // inimigos se movem após ação do jogador
+          moverDemonios();
+          if (vida <= 0) finalizarJogo(false);
+          else if (contadorInimigos === 0) finalizarJogo(true);
+          return true;
+        } else if (mapa[novoX][novoY] === 3) {
+          addLog("⚠️ Caminho bloqueado por um demônio! Atire nele primeiro.");
+        }
+        return false;
+      }
+
+      // Adicione esta função para efeito de explosão
+      function criarEfeitoExplosao(x, y) {
+        // Desenha animação de explosão no canvas
+        let frames = 0;
+        const animacao = setInterval(() => {
+          if (!jogoAtivo || frames >= 8) {
+            clearInterval(animacao);
+            desenharMapa();
+            return;
+          }
+
+          // Desenha efeito de explosão
+          const px = (x - 1) * CELL_W;
+          const py = (y - 1) * CELL_H;
+
+          ctx.save();
+          ctx.shadowBlur = 15;
+          ctx.shadowColor = "orange";
+
+          // Círculos de explosão
+          const intensidade = frames / 8;
+          const raio = CELL_W * (0.5 + intensidade * 2);
+
+          ctx.beginPath();
+          ctx.arc(px + CELL_W / 2, py + CELL_H / 2, raio, 0, Math.PI * 2);
+          ctx.fillStyle = `rgba(255, ${100 - frames * 20}, 0, ${0.8 - intensidade})`;
+          ctx.fill();
+
+          ctx.beginPath();
+          ctx.arc(px + CELL_W / 2, py + CELL_H / 2, raio * 0.6, 0, Math.PI * 2);
+          ctx.fillStyle = `rgba(255, 255, ${100 - frames * 30}, ${0.9 - intensidade})`;
+          ctx.fill();
+
+          ctx.restore();
+
+          frames++;
+        }, 50);
+      }
+
+      // Função modificada para destruir cenário em área
+      function destruirCenarioArea(centroX, centroY, raio) {
+        let algoDestruido = false;
+
+        for (let dx = -raio; dx <= raio; dx++) {
+          for (let dy = -raio; dy <= raio; dy++) {
+            const x = centroX + dx;
+            const y = centroY + dy;
+
+            // Verifica se está dentro do círculo de explosão
+            const distancia = Math.sqrt(dx * dx + dy * dy);
+            if (distancia <= raio && x >= 1 && x <= 20 && y >= 1 && y <= 15) {
+              // Remove paredes (valor 1) e transforma em chão (0)
+              if (mapa[x][y] === 1) {
+                mapa[x][y] = 0;
+                algoDestruido = true;
+                addLog(`💥 Parede destruída em (${x}, ${y})!`);
+              }
+            }
+          }
+        }
+
+        if (algoDestruido) {
+          addLog("🏚️ EXPLOSÃO ABRIU CAMINHO! O cenário foi danificado.");
+        }
+
+        return algoDestruido;
+      }
+
+      // Função modificada para dano em área nos inimigos
+      function danoAreaInimigos(centroX, centroY, raio) {
+        let inimigosAtingidos = 0;
+
+        for (let i = 1; i <= 6; i++) {
+          if (!inimigoVivo[i]) continue;
+
+          const dx = inimigoX[i] - centroX;
+          const dy = inimigoY[i] - centroY;
+          const distancia = Math.sqrt(dx * dx + dy * dy);
+
+          // Inimigos dentro do raio da explosão
+          if (distancia <= raio) {
+            // Mata o inimigo
+            inimigoVivo[i] = false;
+            contadorInimigos--;
+            pontuacao += 100;
+            municao += 2;
+            mapa[inimigoX[i]][inimigoY[i]] = 0;
+            inimigosAtingidos++;
+
+            addLog(`💀 INIMIGO ELIMINADO PELA EXPLOSÃO! +100 pontos`);
+
+            // Cria efeito de explosão em cada inimigo atingido
+            criarEfeitoExplosao(inimigoX[i], inimigoY[i]);
+          }
+        }
+
+        if (inimigosAtingidos > 0) {
+          addLog(
+            `🔥 RPG ACERTOU ${inimigosAtingidos} INIMIGO(S)! Massacre múltiplo!`,
+          );
+          atualizarUI();
+        }
+
+        return inimigosAtingidos;
+      }
+
+      // Função modificada de disparo para suportar efeitos especiais por arma
+      function executarDisparo(direcao) {
+        if (!jogoAtivo) return false;
+        if (municao <= 0) {
+          addLog(
+            "🔇 SEM MUNIÇÃO! Procure matar demônios para ganhar balas (+2 por abate).",
+          );
+          return false;
+        }
+        if (!armaSelecionadaTemp) {
+          addLog("ERRO: nenhuma arma selecionada, tente novamente.");
+          return false;
+        }
+
+        // Gasta munição
+        municao--;
+
+        // ============ ARMA 4: RPG-7 (DANO EM ÁREA E DESTRUIÇÃO) ============
+        if (armaSelecionadaTemp === 4) {
+          let tiroX = jogadorX;
+          let tiroY = jogadorY;
+          let dir = direcao.toLowerCase();
+
+          // Move o projetil até o alvo ou parede
+          while (tiroX > 1 && tiroX < 20 && tiroY > 1 && tiroY < 15) {
+            if (dir === "w") tiroY--;
+            else if (dir === "s") tiroY++;
+            else if (dir === "a") tiroX--;
+            else if (dir === "d") tiroX++;
+
+            // Se encontrar parede, explode nela
+            if (mapa[tiroX][tiroY] === 1) {
+              addLog(`💥 RPG ACERTOU UMA PAREDE! EXPLOSÃO EM ÁREA!`);
+              break;
+            }
+
+            // Se encontrar monstro, explode nele
+            if (mapa[tiroX][tiroY] === 3) {
+              addLog(`💥 RPG ACERTOU UM INIMIGO! EXPLOSÃO MASSIVA!`);
+              break;
+            }
+          }
+
+          // Cria efeito de explosão no ponto de impacto
+          criarEfeitoExplosao(tiroX, tiroY);
+
+          // Dano em área (raio 2 células)
+          const RAIO_EXPLOSAO = 2;
+
+          // Destroi cenário ao redor
+          destruirCenarioArea(tiroX, tiroY, RAIO_EXPLOSAO);
+
+          // Dano em todos inimigos próximos
+          const inimigosMortos = danoAreaInimigos(tiroX, tiroY, RAIO_EXPLOSAO);
+
+          if (inimigosMortos === 0) {
+            addLog(
+              `💣 EXPLOSÃO NA POSIÇÃO (${tiroX}, ${tiroY})! Nenhum inimigo na área.`,
+            );
+          }
+
+          atualizarUI();
+
+          // Verifica vitória
+          if (contadorInimigos <= 0) {
+            finalizarJogo(true);
+            return true;
+          }
+
+          return true;
+        }
+
+        // ============ ARMAS NORMAIS (TIRO ÚNICO) ============
+        let tiroX = jogadorX;
+        let tiroY = jogadorY;
+        let alvoAtingido = false;
+        let dir = direcao.toLowerCase();
+
+        while (
+          tiroX > 1 &&
+          tiroX < 20 &&
+          tiroY > 1 &&
+          tiroY < 15 &&
+          !alvoAtingido
+        ) {
+          if (dir === "w") tiroY--;
+          else if (dir === "s") tiroY++;
+          else if (dir === "a") tiroX--;
+          else if (dir === "d") tiroX++;
+          else break;
+
+          // Parede?
+          if (mapa[tiroX][tiroY] === 1) {
+            addLog(`💥 Tiro acertou uma parede!`);
+            alvoAtingido = true;
+            break;
+          }
+          // Acertou monstro?
+          if (mapa[tiroX][tiroY] === 3) {
+            for (let i = 1; i <= 6; i++) {
+              if (
+                inimigoVivo[i] &&
+                inimigoX[i] === tiroX &&
+                inimigoY[i] === tiroY
+              ) {
+                inimigoVivo[i] = false;
+                contadorInimigos--;
+                pontuacao += 100;
+                municao += 2;
+                mapa[tiroX][tiroY] = 0;
+                addLog(
+                  `🔥 MONSTRO ABATIDO! +100 pontos, +2 munição. Restam ${contadorInimigos} inimigos.`,
+                );
+                atualizarUI();
+                alvoAtingido = true;
+                break;
+              }
+            }
+            break;
+          }
+        }
+        if (!alvoAtingido)
+          addLog(
+            `🔫 Disparo na direção ${direcao.toUpperCase()} ecoou no vazio.`,
+          );
+        atualizarUI();
+
+        // Verifica vitória
+        if (contadorInimigos <= 0) {
+          finalizarJogo(true);
+          return true;
+        }
+        return true;
+      }
+
+      // =========================  FIM DE JOGO (GAME OVER / VITÓRIA) ==========================
+      function finalizarJogo(vitoria) {
+        if (!jogoAtivo) return;
+        resetBtn.style.display = "flex";
+        jogoAtivo = false;
+        esperandoInput = true;
+        cancelarModoTiro();
+
+        if (vida <= 0) {
+          addLog(`GAME OVER! Sua alma agora pertenche ao inferno.`);
+
+          // Mostrar imagem da caveira quando perder
+          const caveiraImg = document.createElement("img");
+          caveiraImg.src = "./img/caveira.jpg";
+          caveiraImg.style.maxWidth = "100%";
+          caveiraImg.style.maxHeight = "200px";
+          caveiraImg.style.objectFit = "contain";
+          caveiraImg.style.margin = "10px auto";
+          caveiraImg.style.display = "block";
+          caveiraImg.style.borderRadius = "8px";
+
+          // Adicionar ao logArea ou à área de armas
+          const imgContainer = document.createElement("div");
+          imgContainer.style.textAlign = "center";
+          imgContainer.appendChild(caveiraImg);
+          logArea.appendChild(imgContainer);
+
+          addLog(`⚰️  SCORE FINAL: ${pontuacao}  ⚰️`);
+
+          // Scroll para ver a imagem
+          imgContainer.scrollIntoView({ behavior: "smooth", block: "nearest" });
+        } else if (vitoria || contadorInimigos === 0) {
+          addLog(`🌟🌟🌟 GRANDE VITORIA, MARINE! A BASE ESTA SEGURA. 🌟🌟🌟`);
+          addLog(`🏆 SCORE FINAL: ${pontuacao}  🏆`);
+        }
+        desenharMapa();
+        // mensagem final
+        addLog("🔄 Pressione [RENASCER] para uma nova batalha.");
+      }
+
+      // =========================  EVENTOS DE TECLADO ==========================
+      function handleKeyDown(e) {
+        const key = e.key;
+        // sempre bloquear scroll com setas e WASD
+        if (
+          [
+            "w",
+            "W",
+            "s",
+            "S",
+            "a",
+            "A",
+            "d",
+            "D",
+            "ArrowUp",
+            "ArrowDown",
+            "ArrowLeft",
+            "ArrowRight",
+            "f",
+            "F",
+            "q",
+            "Q",
+            "Escape",
+            "1",
+            "2",
+            "3",
+            "4",
+            "5",
+          ].includes(key)
+        ) {
+          e.preventDefault();
+        }
+
+        if (!jogoAtivo) {
+          if (key === "r" || key === "R") {
+            inicializarJogo();
+            jogoAtivo = true;
+            esperandoInput = false;
+            addLog("🔁 RENASCIDO! O inferno treme novamente.");
+            desenharMapa();
+          }
+          return;
+        }
+
+        // FLUXO DE TIRO PRIORITÁRIO
+        if (aguardandoArma) {
+          if (key >= "1" && key <= "5") {
+            processarEscolhaArma(key);
+          } else if (key === "Escape") {
+            cancelarModoTiro();
+          }
+          return;
+        }
+
+        if (aguardandoDirecao) {
+          if (
+            key === "w" ||
+            key === "W" ||
+            key === "a" ||
+            key === "A" ||
+            key === "s" ||
+            key === "S" ||
+            key === "d" ||
+            key === "D"
+          ) {
+            processarDirecaoTiro(key);
+          } else if (key === "Escape") {
+            cancelarModoTiro();
+          }
+          return;
+        }
+
+        // Modo normal (movimento e atirar)
+        switch (key) {
+          case "w":
+          case "W":
+            moverJogador(0, -1);
+            break;
+          case "s":
+          case "S":
+            moverJogador(0, 1);
+            break;
+          case "a":
+          case "A":
+            moverJogador(-1, 0);
+            break;
+          case "d":
+          case "D":
+            moverJogador(1, 0);
+            break;
+          case "f":
+          case "F":
+            iniciarSequenciaTiro();
+            break;
+          case "q":
+          case "Q":
+            addLog("🚪 SAÍDA SOLICITADA. MARINE ABANDONA O INFERNO.");
+            finalizarJogo(false);
+            break;
+          case "Escape":
+            break;
+          default:
+            break;
+        }
+        atualizarUI();
+        desenharMapa();
+        if (vida <= 0) finalizarJogo(false);
+        if (contadorInimigos === 0) finalizarJogo(true);
+      }
+
+      // Botão reset
+      resetBtn.addEventListener("click", () => {
+        inicializarJogo();
+        jogoAtivo = true;
+        esperandoInput = false;
+        aguardandoArma = false;
+        aguardandoDirecao = false;
+        desenharMapa();
+      });
+
+      window.addEventListener("keydown", handleKeyDown);
+      inicializarJogo();
+      desenharMapa();
+    </script>
+  </body>
+</html>
