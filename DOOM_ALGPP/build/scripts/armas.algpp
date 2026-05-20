@@ -1,0 +1,35 @@
+arma pistola
+    nome "PISTOLA"
+    dano 1
+    municao 12
+    municao_max 12
+    alcance 5
+    cor ciano
+fimarma
+
+arma shotgun
+    nome "SHOTGUN"
+    dano 2
+    municao 7
+    municao_max 7
+    alcance 3
+    cor amarelo
+fimarma
+
+arma rifle
+    nome "RIFLE"
+    dano 3
+    municao 14
+    municao_max 14
+    alcance 6
+    cor verde
+fimarma
+
+arma cannon
+    nome "CANNON"
+    dano 5
+    municao 5
+    municao_max 5
+    alcance 5
+    cor magenta
+fimarma

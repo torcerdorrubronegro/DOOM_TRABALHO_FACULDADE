@@ -1,0 +1,19 @@
+Marcell — abertura
+
+“Bom dia, professor. Nosso projeto é o DoomALG, um jogo feito em Portugol para rodar no VisuALG. Ele tem fases, inimigos, itens, armas, chefe final e modo apresentação. A versão principal está no arquivo doom.alg, que é a entrega oficial.”
+
+Pedro — funcionamento
+
+“O jogo usa comandos simples: W e S para andar, A e D para girar, F para atirar, R para recarregar e Z/X para trocar de arma. Também criamos comandos compostos, então dá para digitar várias ações de uma vez, como WWW ou FFR.”
+
+Davi — lógica
+
+“A estrutura usa matrizes para o mapa e para a tela, vetores para inimigos e armas, condicionais para decisões e laços para o menu e o jogo. Os inimigos perseguem o jogador, e algumas fases exigem chave ou a derrota do chefe para liberar a saída.”
+
+Marcell — adicional DoomALG++
+
+“Além da versão oficial no VisuALG, fizemos uma versão adicional chamada DoomALG++. Nela o jogo continua descrito em uma sintaxe inspirada em Portugol, mas é interpretado por um runtime em Python. Isso permite cores, input sem Enter e uma visão em raycasting.”
+
+Fechamento
+
+“Nosso foco foi aplicar lógica de programação em um jogo completo, usando estruturas como matrizes, vetores, procedimentos, condicionais e repetição. A versão em VisuALG atende ao trabalho, e a versão DoomALG++ mostra uma evolução técnica do mesmo conceito.”

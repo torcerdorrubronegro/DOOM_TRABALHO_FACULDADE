@@ -1,0 +1,63 @@
+1. O trabalho não era para ser em VisuALG?
+
+Sim. A versão oficial é o DOOM_ALG/doom.alg, feita em Portugol para rodar no VisuALG 3. A versão DoomALG++ é apenas adicional.
+
+2. Por que existe uma versão em Python?
+
+Porque o VisuALG tem limitações, como falta de cores e input sem Enter. O Python foi usado apenas como runtime para interpretar uma sintaxe inspirada em Portugol e mostrar uma evolução visual.
+
+3. O jogo em Python substitui o doom.alg?
+
+Não. O doom.alg é a entrega principal. O doom.exe é extra.
+
+4. Onde aparecem matrizes e vetores?
+
+O mapa é uma matriz, a tela também é montada em matriz de caracteres, e inimigos, armas e atributos são controlados com vetores.
+
+5. Quais estruturas de programação foram usadas?
+
+Entrada e saída, condicionais, laços de repetição, vetores, matrizes e procedimentos. Isso bate diretamente com os requisitos do trabalho.
+
+6. Por que o jogo no VisuALG precisa apertar Enter?
+
+Porque o VisuALG não captura tecla em tempo real. Para contornar isso, criamos comandos compostos de até 8 letras por entrada.
+
+7. O que são comandos compostos?
+
+É quando o jogador digita várias ações juntas. Por exemplo, WWW anda três vezes; FFR atira duas vezes e recarrega.
+
+8. Como funciona a visão em primeira pessoa no VisuALG?
+
+Ela é simulada por faixas de parede em ASCII. O jogo calcula a distância até paredes próximas e desenha a tela com base nisso.
+
+9. Como funciona o raycasting no DoomALG++?
+
+O runtime lança raios a partir da posição do jogador. Quando um raio encontra uma parede, calcula a distância e desenha uma coluna proporcional. Isso cria a sensação de 3D.
+
+10. É raytracing real?
+
+Não. O correto é raycasting 2.5D. É a técnica usada para simular visão de FPS antigo em mapas 2D.
+
+11. Como os inimigos funcionam?
+
+Eles têm posição no mapa, vida, dano e tipo. A IA tenta aproximar o inimigo do jogador e ataca quando está dentro do alcance.
+
+12. Por que existe modo apresentação?
+
+Para demonstrar o jogo em sala sem risco de morrer muito cedo. Ele dá mais vida, mais munição e reduz a dificuldade.
+
+13. Como a saída é liberada?
+
+Depende da fase. Algumas fases liberam direto, outras exigem chave, e a fase final exige derrotar o boss.
+
+14. O que acontece se o jogador morrer?
+
+Aparece a tela de derrota, e o jogador pode voltar ao menu.
+
+15. Como o professor deve executar?
+
+Pela entrega principal: abrir DOOM_ALG/doom.alg no VisuALG 3 e pressionar F9. O manual de uso está no README.
+
+16. O que vale para nota?
+
+A versão em VisuALG. O DoomALG++ é uma demonstração extra para mostrar evolução técnica.

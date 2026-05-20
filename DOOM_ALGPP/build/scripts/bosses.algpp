@@ -1,0 +1,12 @@
+boss overlord
+    nome "OVERLORD ASCII"
+    letra O
+    vida 16
+    vida_max 16
+    dano 18
+    cadencia 3
+    alcance 3
+    cor magenta
+    bloqueia_saida sim
+    arma_recomendada cannon
+fimboss

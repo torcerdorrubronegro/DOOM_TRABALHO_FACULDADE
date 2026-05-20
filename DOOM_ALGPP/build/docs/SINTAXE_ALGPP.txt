@@ -1,0 +1,299 @@
+SINTAXE DO PORTUGOL++
+=====================
+
+O Portugol++ eh uma linguagem simples, inspirada em Portugol,
+usada apenas pelo runtime do DoomALG++. Os arquivos tem
+extensao .algpp e ficam em build/scripts/.
+
+Esta versao reconhece os blocos abaixo. Tudo o que nao for
+listado aqui eh ignorado ou tratado como erro.
+
+
+REGRAS GERAIS
+-------------
+
+- Cada linha eh um comando ou parte de um bloco.
+- Linhas em branco e linhas que comecam com # sao ignoradas.
+- Strings vao entre aspas duplas: "texto".
+- Numeros e identificadores nao precisam de aspas.
+- Blocos sempre comecam com uma palavra-chave e terminam com a
+  forma fim<palavra>. Exemplo: cores ... fimcores.
+- Um bloco "fase" pode conter um bloco bruto "mapa inicio ...
+  fimmapa".
+- Apenas o bloco "algoritmo" pode conter outros blocos nomeados.
+  Os demais blocos so aceitam chave-valor (e blocos brutos
+  proprios, quando houver).
+
+
+BLOCO PRINCIPAL
+---------------
+
+algoritmo "<titulo>"
+    <sub-blocos>
+    usar "outro.algpp"
+    iniciar fase "<nome da fase>"
+fimalgoritmo
+
+O bloco algoritmo eh obrigatorio. Tudo o mais fica dentro dele.
+
+
+CONFIGURACAO
+------------
+
+configuracao
+    titulo "<texto>"
+    largura <N>
+    altura <N>
+    fps <N>
+    input tempo_real
+    renderizacao <mapa|raycast>
+    fov <graus>
+    raios <N>
+    distancia_visao <N>
+    mostrar_minimapa <sim|nao>
+fimconfiguracao
+
+Define titulo do jogo, tamanho de tela, fps e tipo de entrada.
+
+Campos do renderer:
+    renderizacao        "mapa" usa o renderer 2D top-down classico;
+                        "raycast" usa o renderer pseudo-3D em
+                        primeira pessoa por raycasting 2.5D.
+    fov                 angulo de visao em graus no modo raycast.
+    raios               quantidade de raios disparados por frame.
+    distancia_visao     alcance maximo dos raios em celulas.
+    mostrar_minimapa    se "sim", desenha um minimapa pequeno no
+                        canto superior direito.
+
+Os campos do bloco "cores" ganham um papel novo:
+    teto                cor usada para a metade superior da cena
+                        em modo raycast.
+
+
+CORES
+-----
+
+cores
+    parede   <cor>
+    chao     <cor>
+    jogador  <cor>
+    inimigo  <cor>
+    boss     <cor>
+    item     <cor>
+    saida    <cor>
+    hud      <cor>
+    chave    <cor>
+    arma     <cor>
+fimcores
+
+Cores aceitas:
+    preto, vermelho, verde, amarelo, azul, magenta, ciano,
+    branco, cinza.
+
+Essas cores sao mapeadas para codigos ANSI pelo runtime.
+
+
+JOGADOR
+-------
+
+jogador
+    vida <N>
+    vida_max <N>
+    posicao <X> <Y>
+    direcao <norte|sul|leste|oeste>
+    arma_inicial <codigo>
+fimjogador
+
+Define o estado inicial do jogador. A posicao do jogador na
+fase tem prioridade sobre a posicao global quando a fase
+declarar a sua propria.
+
+
+FASE
+----
+
+fase "<nome>"
+    tamanho <largura> <altura>
+    jogador <X> <Y> <direcao>
+    mapa inicio
+    <texto do mapa>
+    fimmapa
+    boss <codigo> <X> <Y>
+    objetivo "<texto>"
+fimfase
+
+O bloco mapa inicio ... fimmapa contem o desenho bruto da fase.
+Caracteres reconhecidos no mapa:
+    #   parede
+    .   chao livre
+    K   kit de vida
+    A   municao
+    C   chave
+    W   arma coletavel
+    X   saida
+    G   GRUNT (inimigo)
+    B   BRUTE
+    S   STALKER
+    P   SPITTER
+    N   SENTINEL
+    O   marcador de boss
+
+Linhas com menos colunas do que <largura> sao completadas com
+"." automaticamente.
+
+
+ARMA
+----
+
+arma <codigo>
+    nome "<texto>"
+    dano <N>
+    municao <N>
+    municao_max <N>
+    alcance <N>
+    cor <cor>
+fimarma
+
+
+INIMIGO
+-------
+
+inimigo <codigo>
+    letra <X>
+    vida <N>
+    dano <N>
+    cor <cor>
+    movimento <perseguir|parado>
+    cadencia <N>
+    ataque <corpo|distancia>
+fiminimigo
+
+
+BOSS
+----
+
+boss <codigo>
+    nome "<texto>"
+    letra <X>
+    vida <N>
+    vida_max <N>
+    dano <N>
+    cor <cor>
+    bloqueia_saida <sim|nao>
+    arma_recomendada <codigo>
+fimboss
+
+
+SPRITE
+------
+
+sprite <codigo>
+    cor <cor>
+    linhas inicio
+    <texto multilinha do desenho>
+    fimlinhas
+fimsprite
+
+O bloco linhas inicio ... fimlinhas guarda o desenho como texto.
+A indentacao comum do bloco eh removida automaticamente (dedent),
+entao voce pode indentar para alinhar o desenho com o resto do
+arquivo sem afetar o sprite.
+
+O caractere de espaco eh tratado como transparente no momento de
+desenhar no terminal.
+
+Convencao de nomes que o renderer raycast procura automaticamente:
+
+    arma_<codigo>       arma do jogador (codigo da arma)
+    inimigo_<codigo>    inimigo no campo de visao
+    boss_<codigo>       chefe no campo de visao
+    item_kit            kit de vida (cor verde)
+    item_ammo           caixa de municao
+    item_chave          chave
+    item_arma           arma coletavel no mapa
+    saida               saida da fase (X)
+
+Exemplo dos codigos esperados pelo jogo padrao:
+
+    arma_pistola, arma_shotgun, arma_rifle, arma_cannon
+    inimigo_grunt, inimigo_brute, inimigo_stalker,
+    inimigo_spitter, inimigo_sentinel
+    boss_overlord
+
+
+COMANDOS
+--------
+
+usar "<arquivo.algpp>"
+
+    Importa outro arquivo .algpp. O caminho eh relativo ao
+    arquivo que esta sendo lido. O parser evita importar o
+    mesmo arquivo duas vezes.
+
+iniciar fase "<nome>"
+
+    Define a fase a ser carregada quando o jogo comeca. Use
+    o mesmo nome que aparece em "fase <nome>".
+
+
+EXEMPLO MINIMO
+--------------
+
+algoritmo "Teste"
+
+configuracao
+    titulo "Teste"
+    largura 80
+    altura 24
+    fps 30
+    input tempo_real
+fimconfiguracao
+
+cores
+    parede cinza
+    chao preto
+    jogador verde
+    saida azul
+    hud branco
+fimcores
+
+jogador
+    vida 100
+    vida_max 100
+    posicao 2 2
+    direcao leste
+    arma_inicial pistola
+fimjogador
+
+fase "Sala"
+    tamanho 12 6
+    jogador 2 2 leste
+
+    mapa inicio
+    ############
+    #..........#
+    #.........X#
+    #..........#
+    #..........#
+    ############
+    fimmapa
+
+    objetivo "Va para a saida"
+fimfase
+
+iniciar fase "Sala"
+
+fimalgoritmo
+
+
+O QUE NAO ESTA IMPLEMENTADO AINDA
+---------------------------------
+
+Estes blocos podem aparecer na proxima fase do projeto:
+
+    item     bloco proprio (no PP0 itens vem do mapa)
+    hud      personalizar o cabecalho
+    comando  vincular tecla a uma acao customizada
+
+Sera adicionado conforme as fases PP7 (armas e itens) e PP9
+(HUD colorido) avancarem.

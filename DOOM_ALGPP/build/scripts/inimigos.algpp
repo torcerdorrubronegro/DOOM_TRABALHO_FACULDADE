@@ -1,0 +1,54 @@
+inimigo grunt
+    letra G
+    vida 1
+    dano 6
+    cor vermelho
+    movimento perseguir
+    cadencia 2
+    ataque corpo
+    alcance 1
+fiminimigo
+
+inimigo brute
+    letra B
+    vida 3
+    dano 12
+    cor vermelho
+    movimento perseguir
+    cadencia 3
+    ataque corpo
+    alcance 1
+fiminimigo
+
+inimigo stalker
+    letra S
+    vida 1
+    dano 5
+    cor vermelho
+    movimento perseguir
+    cadencia 1
+    ataque corpo
+    alcance 1
+fiminimigo
+
+inimigo spitter
+    letra P
+    vida 2
+    dano 6
+    cor vermelho
+    movimento parado
+    cadencia 2
+    ataque distancia
+    alcance 5
+fiminimigo
+
+inimigo sentinel
+    letra N
+    vida 2
+    dano 10
+    cor vermelho
+    movimento perseguir
+    cadencia 3
+    ataque corpo
+    alcance 1
+fiminimigo

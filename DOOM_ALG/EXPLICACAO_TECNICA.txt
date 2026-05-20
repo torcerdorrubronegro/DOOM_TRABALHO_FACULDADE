@@ -1,0 +1,508 @@
+EXPLICACAO TECNICA - DoomALG e DoomALG++
+=======================================
+
+Projeto: DoomALG
+Disciplina: ALGORITMOS E ESTRUTURAS DE DADOS
+Professor: MAXWELL GOMES DA SILVA
+
+Alunos:
+Marcell Alves Resende             RA: 5178278
+Pedro Andrade Santos              RA: 5180749
+Davi Augusto Alves de Assis       RA: 5181548
+
+
+============================================================
+ORDEM SUGERIDA DE LEITURA NA APRESENTACAO
+============================================================
+
+Marcell:
+1. Visao geral do projeto.
+2. Entrega oficial em VisuALG.
+3. Modo apresentacao.
+4. Versao adicional DoomALG++.
+
+Pedro:
+1. Como jogar.
+2. Controles.
+3. Comandos compostos.
+4. Itens, armas e objetivos.
+
+Davi:
+1. Estrutura tecnica do doom.alg.
+2. Matrizes, vetores e procedimentos.
+3. Inimigos, boss e fases.
+4. Funcionamento tecnico do DoomALG++.
+
+
+============================================================
+PARTE 1 - MARCELL - VISAO GERAL
+============================================================
+
+O DoomALG tem duas versoes.
+
+VERSAO OFICIAL:
+
+    DOOM_ALG/doom.alg
+
+Essa versao foi escrita em Portugol para rodar no VisuALG 3.
+Ela e a entrega principal do trabalho.
+
+VERSAO ADICIONAL:
+
+    DOOM_ALGPP/
+
+Essa versao se chama DoomALG++. Ela usa arquivos .algpp com
+uma sintaxe inspirada em Portugol. Um runtime em Python le
+esses arquivos, interpreta o jogo e renderiza no terminal com
+cores, input sem ENTER, threads e raycasting 2.5D.
+
+A versao DoomALG++ nao substitui a versao em VisuALG. Ela e
+um adicional para demonstrar evolucao tecnica.
+
+
+============================================================
+PARTE 2 - DAVI - ESTRUTURA DO doom.alg
+============================================================
+
+O arquivo doom.alg e um unico programa em Portugol.
+
+Ele usa:
+
+- entrada e saida;
+- condicionais;
+- lacos de repeticao;
+- vetores;
+- matrizes;
+- procedimentos.
+
+O mapa do jogo e uma matriz de 12 linhas por 24 colunas.
+
+Cada posicao do mapa guarda um caractere:
+
+    .   chao livre
+    #   parede
+    K   kit de vida
+    A   municao
+    C   chave
+    W   arma coletavel
+    X   saida
+
+O jogador possui uma posicao dentro dessa matriz:
+
+    px   coluna
+    py   linha
+
+A direcao do jogador e representada por um indice de 0 a 7,
+permitindo oito direcoes:
+
+    norte
+    nordeste
+    leste
+    sudeste
+    sul
+    sudoeste
+    oeste
+    noroeste
+
+A direcao usa tabelas auxiliares:
+
+    dxTab     deslocamento horizontal
+    dyTab     deslocamento vertical
+    lxTab     deslocamento lateral horizontal
+    lyTab     deslocamento lateral vertical
+
+
+============================================================
+PARTE 3 - DAVI - TELA E RENDERIZACAO NO VISUALG
+============================================================
+
+A tela tambem e uma matriz.
+
+Tamanho:
+
+    36 linhas por 120 colunas
+
+Nome usado no codigo:
+
+    tela
+
+Em vez de imprimir tudo direto com escreval, o jogo monta o
+frame inteiro dentro da matriz tela. Depois imprime linha por
+linha.
+
+A rotina geral de renderizacao faz:
+
+1. Limpa a matriz da tela.
+2. Desenha a borda.
+3. Desenha HUD.
+4. Desenha painel de arma.
+5. Desenha barra de boss.
+6. Desenha moldura da visao principal.
+7. Preenche teto e chao.
+8. Calcula faixas de distancia.
+9. Desenha paredes.
+10. Desenha itens.
+11. Desenha inimigos.
+12. Desenha boss.
+13. Desenha mira.
+14. Desenha arma.
+15. Desenha minimapa.
+16. Desenha comandos e mensagens.
+17. Imprime a tela.
+
+A visao em primeira pessoa no VisuALG nao e raycasting
+completo. Ela e uma simulacao por faixas verticais. Para cada
+faixa, o jogo mede a distancia ate a parede mais proxima e
+desenha uma parede maior ou menor.
+
+
+============================================================
+PARTE 4 - PEDRO - CONTROLES E COMANDOS COMPOSTOS
+============================================================
+
+Controles:
+
+    W   andar para frente
+    S   recuar
+    A   girar para esquerda
+    D   girar para direita
+    F   atirar
+    R   recarregar
+    Z   arma anterior
+    X   proxima arma
+    H   ajuda
+    Q   sair para o menu
+
+O VisuALG nao captura tecla em tempo real. Ele le entrada
+com ENTER.
+
+Para melhorar a jogabilidade, foi criado o sistema de
+comandos compostos.
+
+O jogador pode digitar ate 8 letras de uma vez.
+
+Exemplos:
+
+    WWW       anda tres vezes
+    FFR       atira duas vezes e recarrega
+    ZXF       troca arma e atira
+    AWAWDS    combina giro e movimento
+
+O programa percorre a string caractere por caractere e
+executa cada acao na ordem.
+
+A sequencia pode parar se:
+
+- o jogador morrer;
+- a fase terminar;
+- o jogador abrir a ajuda;
+- o jogador sair para o menu.
+
+
+============================================================
+PARTE 5 - PEDRO - ARMAS, ITENS E OBJETIVOS
+============================================================
+
+Armas:
+
+    PISTOLA
+    SHOTGUN
+    RIFLE
+    CANNON
+
+Cada arma tem:
+
+    nome
+    dano
+    municao atual
+    municao maxima
+    estado de desbloqueio
+
+No modo normal:
+
+    PISTOLA   dano 1   municao 12
+    SHOTGUN   dano 2   municao 7
+    RIFLE     dano 3   municao 14
+    CANNON    dano 5   municao 5
+
+No modo apresentacao, a vida e a municao sao maiores e algumas
+armas ja comecam liberadas.
+
+Itens:
+
+    K   kit de vida
+    A   municao
+    C   chave
+    W   arma coletavel
+    X   saida
+
+A saida pode estar bloqueada.
+
+Regras:
+
+- se a fase exige chave, o jogador precisa pegar C;
+- se a fase exige boss morto, precisa derrotar o chefe;
+- quando os requisitos sao cumpridos, X conclui a fase.
+
+
+============================================================
+PARTE 6 - DAVI - INIMIGOS E BOSS NO VISUALG
+============================================================
+
+Os inimigos ficam em vetores paralelos.
+
+Exemplo:
+
+    inimigoX
+    inimigoY
+    inimigoVivo
+    inimigoTipo
+    inimigoVida
+
+Tipos:
+
+    GRUNT
+    BRUTE
+    STALKER
+    SPITTER
+    SENTINEL
+
+Cada tipo tem comportamento diferente:
+
+GRUNT:
+    inimigo basico.
+
+BRUTE:
+    mais resistente.
+
+STALKER:
+    mais rapido.
+
+SPITTER:
+    ataca a distancia em linha reta.
+
+SENTINEL:
+    guarda areas e causa dano maior.
+
+O chefe final e o OVERLORD ASCII.
+
+Na fase final, a saida fica bloqueada enquanto o chefe estiver
+vivo. Quando o chefe morre, a saida e liberada.
+
+
+============================================================
+PARTE 7 - MARCELL - MODO APRESENTACAO
+============================================================
+
+O modo apresentacao existe para facilitar a demonstracao em
+sala.
+
+Ele altera alguns parametros:
+
+- vida maior;
+- mais municao;
+- menos inimigos;
+- armas liberadas mais cedo;
+- boss final mais acessivel.
+
+A logica principal continua a mesma. O modo apresentacao
+apenas reduz o risco de morrer cedo durante a apresentacao.
+
+
+============================================================
+PARTE 8 - MARCELL - DOOMALG++ E PORTUGOL++
+============================================================
+
+DoomALG++ e uma versao adicional.
+
+Ela foi criada para mostrar como o projeto poderia evoluir
+alem das limitacoes do VisuALG.
+
+A ideia principal:
+
+    O jogo e escrito em Portugol++.
+    Python interpreta e executa esse Portugol++.
+
+Portugol++ e uma sintaxe inspirada em Portugol.
+
+Exemplo conceitual:
+
+    algoritmo "DoomALG++"
+
+    configuracao
+        titulo "DoomALG++"
+        largura 120
+        altura 36
+        fps 30
+        input tempo_real
+        renderizacao raycast
+    fimconfiguracao
+
+    usar "fases.algpp"
+    usar "armas.algpp"
+    usar "inimigos.algpp"
+
+    iniciar fase "Corredor Inicial"
+
+    fimalgoritmo
+
+Os arquivos .algpp descrevem:
+
+    fases
+    mapas
+    armas
+    inimigos
+    boss
+    sprites
+    cores
+    objetivos
+
+O Python e dividido em modulos:
+
+    parser.py          le os arquivos .algpp
+    interpreter.py     transforma declaracoes em estado do jogo
+    game_state.py      guarda dados do jogo em execucao
+    gameplay.py        acoes do jogador
+    ai.py              inteligencia dos inimigos
+    renderer.py        escolhe renderer 2D ou raycast
+    renderer_raycast.py desenha a visao 3D por raycasting
+    input_thread.py    captura teclas sem ENTER
+    terminal.py        controla terminal
+    colors.py          aplica cores
+    telas.py           menu, creditos, vitoria e derrota
+    main.py            ponto de entrada
+
+O Python nao e o jogo principal. Ele e o runtime.
+
+O jogo continua descrito nos arquivos:
+
+    scripts/doom.algpp
+    scripts/fases.algpp
+    scripts/armas.algpp
+    scripts/inimigos.algpp
+    scripts/bosses.algpp
+    scripts/sprites.algpp
+
+
+============================================================
+PARTE 9 - DAVI - COMO O DOOMALG++ EXECUTA
+============================================================
+
+Fluxo do DoomALG++:
+
+1. main.py inicia o runtime.
+2. parser.py le scripts/doom.algpp.
+3. O comando usar importa outros arquivos .algpp.
+4. interpreter.py monta o GameState.
+5. input_thread.py captura teclas sem ENTER.
+6. gameplay.py executa movimento, tiro, recarga e coleta.
+7. ai.py atualiza inimigos e boss por tick.
+8. renderer.py chama o renderer correto.
+9. renderer_raycast.py desenha a cena em raycasting 2.5D.
+10. terminal.py imprime no terminal.
+
+A renderizacao por raycasting funciona assim:
+
+1. O jogador tem posicao e angulo.
+2. Para cada coluna da tela, o runtime lanca um raio.
+3. O raio anda pelo mapa ate bater em uma parede.
+4. A distancia ate a parede define a altura da coluna.
+5. Paredes perto ficam maiores.
+6. Paredes longe ficam menores.
+7. Entidades como inimigos, boss, itens e saida sao projetadas
+   na cena usando sprites.
+
+Isso nao e raytracing real. O nome correto e raycasting 2.5D.
+E a tecnica classica para simular uma visao de FPS antigo em
+um mapa 2D.
+
+
+============================================================
+PARTE 10 - PEDRO - CONTROLES DO DOOMALG++
+============================================================
+
+Na versao DoomALG++, o input nao precisa de ENTER.
+
+Controles:
+
+    W   andar para frente
+    S   recuar
+    A   girar esquerda
+    D   girar direita
+    F   atirar
+    R   recarregar
+    Z   arma anterior
+    X   proxima arma
+    Q   sair
+
+Diferenca principal:
+
+No VisuALG:
+    o jogador digita e aperta ENTER.
+
+No DoomALG++:
+    o runtime le as teclas direto, usando input sem bloqueio.
+
+
+============================================================
+PARTE 11 - LIMITACOES E SOLUCOES
+============================================================
+
+Limitacoes do VisuALG:
+
+- nao tem input sem ENTER;
+- nao tem cores no console padrao;
+- nao tem threads;
+- nao tem renderizacao rapida;
+- nao diferencia bem algumas variaveis por maiuscula/minuscula;
+- algumas palavras causam conflito;
+- comentarios com duas barras podem quebrar em algumas versoes.
+
+Solucoes na versao doom.alg:
+
+- comandos compostos;
+- tela como matriz;
+- sprites em ASCII;
+- procedimentos separados;
+- modo apresentacao.
+
+Solucoes na versao DoomALG++:
+
+- runtime em Python;
+- arquivos .algpp para manter a ideia de Portugol;
+- terminal com cores;
+- input sem ENTER;
+- thread de input;
+- raycasting 2.5D;
+- sprites maiores.
+
+
+============================================================
+PARTE 12 - FECHAMENTO TECNICO
+============================================================
+
+A versao em VisuALG demonstra os conceitos da disciplina:
+
+- entrada e saida;
+- variaveis;
+- condicionais;
+- repeticao;
+- vetores;
+- matrizes;
+- procedimentos;
+- controle de estado;
+- organizacao de fases.
+
+A versao DoomALG++ demonstra uma evolucao da mesma ideia:
+
+- linguagem simples inspirada em Portugol;
+- interpretador;
+- runtime;
+- renderizacao em terminal;
+- cores;
+- input sem ENTER;
+- raycasting.
+
+A entrega oficial continua sendo o doom.alg. O DoomALG++ e
+apenas um adicional para mostrar pesquisa, evolucao tecnica e
+criatividade.

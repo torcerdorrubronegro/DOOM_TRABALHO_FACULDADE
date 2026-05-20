@@ -1,0 +1,46 @@
+algoritmo "DoomALG++"
+
+configuracao
+    titulo "DoomALG++"
+    largura 80
+    altura 24
+    fps 30
+    input tempo_real
+    renderizacao raycast
+    fov 60
+    raios 80
+    distancia_visao 18
+    mostrar_minimapa sim
+fimconfiguracao
+
+cores
+    parede cinza
+    chao preto
+    teto azul
+    jogador verde
+    inimigo vermelho
+    boss magenta
+    item amarelo
+    saida azul
+    hud branco
+    chave amarelo
+    arma ciano
+fimcores
+
+jogador
+    vida 120
+    vida_max 120
+    posicao 3 2
+    direcao leste
+    arma_inicial pistola
+fimjogador
+
+usar "fases.algpp"
+usar "armas.algpp"
+usar "inimigos.algpp"
+usar "bosses.algpp"
+usar "sprites.algpp"
+
+iniciar fase "Corredor Inicial"
+
+fimalgoritmo

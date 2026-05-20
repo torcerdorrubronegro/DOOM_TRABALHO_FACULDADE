@@ -1,0 +1,173 @@
+sprite boss_overlord
+    cor magenta
+    linhas inicio
+           _______
+         /  X   X  \
+        | |       | |
+        |  \=====/  |
+        |  V V V V  |
+         \  =====  /
+          \_______/
+            | | |
+           / / \ \
+    fimlinhas
+fimsprite
+
+sprite inimigo_grunt
+    cor vermelho
+    linhas inicio
+          ___
+         / G \
+         \_+_/
+         /|||\
+         / | \
+    fimlinhas
+fimsprite
+
+sprite inimigo_brute
+    cor vermelho
+    linhas inicio
+          _____
+         / B B \
+         | ### |
+         |/| |\|
+          | | |
+         /  |  \
+    fimlinhas
+fimsprite
+
+sprite inimigo_stalker
+    cor vermelho
+    linhas inicio
+           .S.
+          /|\
+          /|\
+          / \
+    fimlinhas
+fimsprite
+
+sprite inimigo_spitter
+    cor vermelho
+    linhas inicio
+          ___
+        (P=P)
+         \_/
+          |
+         / \
+    fimlinhas
+fimsprite
+
+sprite inimigo_sentinel
+    cor vermelho
+    linhas inicio
+         [N N]
+         |***|
+         [___]
+          |||
+          / \
+    fimlinhas
+fimsprite
+
+sprite arma_pistola
+    cor branco
+    linhas inicio
+
+
+                          ___
+                         |   |
+                         | o |
+                       __|   |__
+                      |_________|
+                       |  ___  |
+                       | |   | |
+                       |_|   |_|
+    fimlinhas
+fimsprite
+
+sprite arma_shotgun
+    cor amarelo
+    linhas inicio
+                  _________________
+                 [_________________]
+                       |       |
+                       |       |
+                    [#####] [#####]
+                    [#####] [#####]
+                       \_______/
+    fimlinhas
+fimsprite
+
+sprite arma_rifle
+    cor verde
+    linhas inicio
+
+                ___________________
+              =[____________________]====
+                       |       |
+                     [#######]
+                     [#######]
+                       |   |
+                       |   |
+    fimlinhas
+fimsprite
+
+sprite arma_cannon
+    cor magenta
+    linhas inicio
+                  _________________
+                 /                 \
+                [        O         ]
+                 \_________________/
+                       |||||
+                    [#########]
+                    [#########]
+                       \___/
+    fimlinhas
+fimsprite
+
+sprite item_kit
+    cor verde
+    linhas inicio
+         +---+
+         |KIT|
+         +---+
+    fimlinhas
+fimsprite
+
+sprite item_ammo
+    cor amarelo
+    linhas inicio
+         +---+
+         |AMO|
+         +---+
+    fimlinhas
+fimsprite
+
+sprite item_chave
+    cor amarelo
+    linhas inicio
+         +---+
+         |CHV|
+         +---+
+    fimlinhas
+fimsprite
+
+sprite item_arma
+    cor ciano
+    linhas inicio
+         +---+
+         |ARM|
+         +---+
+    fimlinhas
+fimsprite
+
+sprite saida
+    cor azul
+    linhas inicio
+        +-----+
+        |EXIT |
+        |  |  |
+        |  |  |
+        +-----+
+    fimlinhas
+fimsprite
