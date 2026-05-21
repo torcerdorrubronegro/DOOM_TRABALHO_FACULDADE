@@ -7,8 +7,22 @@
       content="width=device-width, initial-scale=1.0, user-scalable=no"
     />
     <title>DOOM PORTUGOL - RIP AND TEAR! | Marine vs Inferno</title>
-    <link rel="shortcut icon" href="./img/doom-favicon.jpg" type="image/x-icon">
+    <link
+      rel="shortcut icon"
+      href="./img/doom-favicon.jpg"
+      type="image/x-icon"
+    />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/7.0.1/css/all.min.css"
+      integrity="sha512-2SwdPD6INVrV/lHTZbO2nodKhrnDdJK9/kg2XD1r9uGqPo1cUbujc+IYdlYdEErWNu69gVcYgdxlmVmzTWnetw=="
+      crossorigin="anonymous"
+      referrerpolicy="no-referrer"
+    />
+
     <style>
+      @import url('https://fonts.googleapis.com/css2?family=DotGothic16&display=swap');
+
       * {
         margin: 0;
         padding: 0;
@@ -23,12 +37,161 @@
         height: 100%;
         overflow: hidden;
         background: #050608;
-        font-family: "Courier New", monospace;
+        font-family: "DotGothic16", sans-serif, monospace;
       }
 
       body {
         padding: 16px;
         background: linear-gradient(145deg, #0a0c12 0%, #030507 100%);
+      }
+
+      .damage-overlay {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        pointer-events: none;
+        z-index: 1000;
+        opacity: 0;
+        transition: opacity 0.1s ease;
+      }
+
+      .damage-overlay.active {
+        opacity: 1;
+      }
+
+      .screen-blood {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: radial-gradient(
+          circle,
+          rgba(139, 0, 0, 0) 0%,
+          rgba(139, 0, 0, 0.3) 50%,
+          rgba(180, 0, 0, 0.6) 80%,
+          rgba(100, 0, 0, 0.8) 100%
+        );
+        mix-blend-mode: multiply;
+      }
+
+      .blood-splatter {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><circle cx="20" cy="30" r="3" fill="%238b0000" opacity="0.6"/><circle cx="75" cy="25" r="4" fill="%238b0000" opacity="0.5"/><circle cx="45" cy="80" r="5" fill="%238b0000" opacity="0.4"/><circle cx="85" cy="70" r="3" fill="%238b0000" opacity="0.7"/><circle cx="15" cy="85" r="4" fill="%238b0000" opacity="0.5"/><path d="M30 50 Q35 40 40 50 Q45 60 30 50" fill="%238b0000" opacity="0.4"/><path d="M60 20 Q65 10 70 20 Q75 30 60 20" fill="%238b0000" opacity="0.5"/></svg>');
+        background-repeat: repeat;
+        background-size: 100px 100px;
+        opacity: 0;
+        animation: bloodSplatter 0.5s ease-out forwards;
+      }
+
+      @keyframes bloodSplatter {
+        0% {
+          opacity: 0;
+          transform: scale(1);
+        }
+        20% {
+          opacity: 0.8;
+        }
+        100% {
+          opacity: 0;
+          transform: scale(1.2);
+        }
+      }
+
+      @keyframes shake {
+        0%,
+        100% {
+          transform: translate(0, 0);
+        }
+        10% {
+          transform: translate(-5px, -3px);
+        }
+        20% {
+          transform: translate(4px, 2px);
+        }
+        30% {
+          transform: translate(-3px, 4px);
+        }
+        40% {
+          transform: translate(2px, -2px);
+        }
+        50% {
+          transform: translate(-2px, 3px);
+        }
+        60% {
+          transform: translate(1px, -1px);
+        }
+        70% {
+          transform: translate(-1px, 2px);
+        }
+        80% {
+          transform: translate(0px, -1px);
+        }
+        90% {
+          transform: translate(1px, 0px);
+        }
+      }
+
+      .shake-active {
+        animation: shake 0.3s ease-in-out;
+      }
+
+      /* Efeito de pulso vermelho nas bordas */
+      .red-pulse {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        pointer-events: none;
+        z-index: 999;
+        box-shadow: inset 0 0 50px 20px rgba(255, 0, 0, 0);
+        animation: redPulse 0.5s ease-out forwards;
+      }
+
+      @keyframes redPulse {
+        0% {
+          box-shadow: inset 0 0 0 0 rgba(255, 0, 0, 0);
+        }
+        50% {
+          box-shadow: inset 0 0 100px 40px rgba(255, 0, 0, 0.6);
+        }
+        100% {
+          box-shadow: inset 0 0 0 0 rgba(255, 0, 0, 0);
+        }
+      }
+
+      @keyframes cameraShake {
+        0% {
+          transform: translate(0px, 0px);
+        }
+        25% {
+          transform: translate(-3px, 2px);
+        }
+        50% {
+          transform: translate(3px, -2px);
+        }
+        75% {
+          transform: translate(-2px, -1px);
+        }
+        100% {
+          transform: translate(2px, 1px);
+        }
+      }
+
+      .shake-camera {
+        animation: cameraShake 0.3s ease-in-out;
+      }
+
+      .container {
+        height: 100%;
+        padding-bottom: 100px;
       }
 
       .doom-title {
@@ -61,6 +224,24 @@
         overflow: hidden;
       }
 
+      .game-container::after {
+        content: "";
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: repeating-linear-gradient(
+          0deg,
+          rgba(0, 0, 0, 0.1) 0px,
+          rgba(0, 0, 0, 0.1) 2px,
+          transparent 2px,
+          transparent 4px
+        );
+        pointer-events: none;
+        border-radius: 24px;
+      }
+
       .doom-panel {
         flex: 1;
         display: flex;
@@ -79,7 +260,7 @@
 
         padding: 12px 16px;
 
-        background: #1e1a14e6;
+        background: #637879d7;
         border-bottom: 3px solid #b53b1c;
       }
 
@@ -95,7 +276,11 @@
       }
 
       .stat span {
-        color: #ffb347;
+        color: #f68836;
+      }
+
+      .icon {
+        color: #f68836;
       }
 
       .controls-tip {
@@ -120,20 +305,34 @@
       /* ================= GAME ================= */
 
       .game-area {
-        flex: 3;
-
+        width: 70%;
+        height: 100%;
         display: flex;
         align-items: center;
         justify-content: center;
-
         padding: 1rem;
-
-        background: #0b0907;
+        background: linear-gradient(360deg, #cc0d0dbe, #5c0506bd, #461803b4);
         overflow: hidden;
       }
 
+      .doom-face-player {
+        width: 200px;
+        height: 200px;
+        display: flex;
+        position: relative;
+        border: 3px solid #2a2e32;
+        margin: 10px;
+        align-self: flex-end;
+        margin-left: auto;
+
+        img {
+          width: 100%;
+          height: 100%;
+        }
+      }
+
       .canvas-wrapper {
-        width: 100%;
+        width: 50%;
         height: 100%;
 
         display: flex;
@@ -164,42 +363,26 @@
       /* ================= CONSOLE ================= */
 
       .console-panel {
-        flex: 1.2;
-
         display: flex;
         flex-direction: column;
-
         background: #010101e6;
         border-left: 3px solid #6a3e1a;
-
-        min-width: 280px;
-
         overflow: hidden;
-
-        min-height: 0;
+        max-height: 100%;
+        width: 30%;
         /* IMPORTANTE */
       }
 
       .console-area {
-        flex: 1;
         overflow-y: auto;
-        overflow-x: hidden;
-
-        min-height: 0;
-        /* IMPORTANTE */
-
+        overflow: hidden;
         padding: 1rem;
-
         background: #020202cc;
-
         color: #8bc34a;
         font-size: 0.8rem;
         line-height: 1.5;
-
         border-bottom: 1px solid #3a281a;
-
         text-shadow: 0 0 2px #1f3a0a;
-
         word-break: break-word;
       }
 
@@ -328,23 +511,230 @@
           font-size: 0.72rem;
         }
       }
+
+      /* TELA DE GAME OVER ESTILO DOOM */
+      .gameover-screen {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: linear-gradient(
+          135deg,
+          #0a00009f 0%,
+          #2a000052 50%,
+          #0a00007c 100%
+        );
+        z-index: 2000;
+        display: none;
+        justify-content: center;
+        align-items: center;
+        opacity: 0;
+        transition: opacity 0.8s ease;
+        font-family: "DotGothic16", sans-serif, monospace;
+      }
+
+      .gameover-screen.show {
+        display: flex;
+        animation: fadeInDoom 0.8s ease forwards;
+      }
+
+      @keyframes fadeInDoom {
+        0% {
+          opacity: 0;
+          transform: translateY(100%);
+        }
+        100% {
+          opacity: 1;
+          transform: translateY(0%);
+        }
+      }
+
+      .gameover-content {
+        text-align: center;
+        animation: shakeDoom 0.5s ease-in-out;
+      }
+
+      .gameover-title {
+        font-size: 5rem;
+        font-weight: bold;
+        color: #8b0000;
+        text-shadow:
+          0 0 10px #ff0000,
+          0 0 20px #ff0000,
+          0 0 40px #ff0000,
+          4px 4px 0 #2a0000;
+        letter-spacing: 8px;
+        margin-bottom: 2rem;
+        animation: pulseText 1.5s ease-in-out infinite;
+      }
+
+      @keyframes pulseText {
+        0%,
+        100% {
+          text-shadow:
+            0 0 10px #ff0000,
+            0 0 20px #ff0000,
+            0 0 40px #ff0000,
+            4px 4px 0 #2a0000;
+          transform: scale(1);
+        }
+        50% {
+          text-shadow:
+            0 0 20px #ff0000,
+            0 0 40px #ff0000,
+            0 0 60px #ff0000,
+            4px 4px 0 #2a0000;
+          transform: scale(1.05);
+        }
+      }
+
+      @keyframes shakeDoom {
+        0%,
+        100% {
+          transform: translate(0, 0);
+        }
+        10% {
+          transform: translate(-10px, -5px);
+        }
+        20% {
+          transform: translate(8px, 4px);
+        }
+        30% {
+          transform: translate(-6px, 6px);
+        }
+        40% {
+          transform: translate(4px, -4px);
+        }
+        50% {
+          transform: translate(-3px, 3px);
+        }
+        60% {
+          transform: translate(2px, -2px);
+        }
+        70% {
+          transform: translate(-1px, 1px);
+        }
+      }
+
+      .gameover-stats {
+        background: rgba(0, 0, 0, 0.8);
+        border: 3px solid #8b0000;
+        padding: 2rem;
+        margin: 2rem auto;
+        box-shadow: 0 0 30px rgba(139, 0, 0, 0.5);
+      }
+
+      .gameover-stats p {
+        color: #ff6b6b;
+        font-size: 1.5rem;
+        margin: 1rem 0;
+        text-shadow: 0 0 5px #ff0000;
+      }
+
+      .gameover-stats .score {
+        font-size: 2rem;
+        color: #ff4444;
+        font-weight: bold;
+      }
+
+      .gameover-button {
+        background: #2a0000;
+        color: #ff6b6b;
+        border: 2px solid #8b0000;
+        padding: 15px 40px;
+        font-size: 1.3rem;
+        font-family: "DotGothic16", sans-serif, monospace;
+        font-weight: bold;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        text-transform: uppercase;
+        letter-spacing: 2px;
+      }
+
+      .gameover-button:hover {
+        background: #8b0000;
+        color: #ffffff;
+        border-color: #ff0000;
+        box-shadow: 0 0 20px rgba(139, 0, 0, 0.8);
+        transform: scale(1.05);
+      }
+
+      .gameover-symbol {
+        font-size: 4rem;
+        margin-bottom: 1rem;
+        animation: spinSkull 2s ease-in-out infinite;
+      }
+
+      @keyframes spinSkull {
+        0%,
+        100% {
+          transform: rotate(0deg);
+        }
+        25% {
+          transform: rotate(10deg);
+        }
+        75% {
+          transform: rotate(-10deg);
+        }
+      }
+
+      .blood-drip {
+        position: absolute;
+        bottom: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        pointer-events: none;
+        background: repeating-linear-gradient(
+          180deg,
+          transparent,
+          transparent 90%,
+          rgba(139, 0, 0, 0.3) 90%,
+          rgba(139, 0, 0, 0.5) 95%
+        );
+        animation: drip 2s linear infinite;
+      }
+
+      @keyframes drip {
+        0% {
+          background-position: 0 0;
+        }
+        100% {
+          background-position: 0 20px;
+        }
+      }
     </style>
   </head>
 
   <body>
-    <div>
+    <div class="damage-overlay" id="damageOverlay">
+      <div class="screen-blood"></div>
+      <div class="blood-splatter"></div>
+    </div>
+    <div class="container">
       <div class="doom-title">
-        <img src="./img/doom-titulo.png" alt="">
+        <img src="./img/doom-titulo.png" alt="" />
       </div>
       <div class="game-container">
         <div class="doom-panel">
           <div class="info-bar">
-            <div class="stat">💀 VIDA: <span id="vidaVal">100</span>%</div>
-            <div class="stat">🔫 SHOTGUN: <span id="municaoVal">20</span></div>
-            <div class="stat">⭐ SCORE: <span id="pontuacaoVal">0</span></div>
-            <div class="stat">👹 ALVOS: <span id="inimigosRest">6</span></div>
+            <div class="stat">
+              <i class="fa-solid fa-skull icon"></i> VIDA:
+              <span id="vidaVal">100</span>%
+            </div>
+            <div class="stat">
+              <i class="fa-solid fa-gun icon"></i> SHOTGUN:
+              <span id="municaoVal">20</span>
+            </div>
+            <div class="stat">
+              <i class="fa-solid fa-star icon"></i> SCORE:
+              <span id="pontuacaoVal">0</span>
+            </div>
+            <div class="stat">ALVOS: <span id="inimigosRest">6</span></div>
             <div class="controls-tip">
-              🎮 WASD mover | [F] ATIRAR | [Q] SAIR
+              <i class="fa-solid fa-gamepad icon"></i> WASD mover | [F] ATIRAR |
+              [Q] SAIR
             </div>
           </div>
           <div class="doomInterface">
@@ -352,6 +742,9 @@
             <div class="game-area">
               <div class="canvas-wrapper">
                 <canvas id="doomCanvas" width="600" height="450"></canvas>
+              </div>
+              <div class="doom-face-player">
+                <img src="./img/doom-face-player.jpg" alt="" />
               </div>
             </div>
 
@@ -377,13 +770,31 @@
         </div>
       </div>
     </div>
-
+    <!-- TELA DE GAME OVER -->
+    <div class="gameover-screen" id="gameoverScreen">
+      <div class="blood-drip"></div>
+      <div class="gameover-content">
+        <div class="gameover-symbol">💀☠️💀</div>
+        <div class="gameover-title">GAME OVER</div>
+        <div class="gameover-stats">
+          <p>🔥 VOCÊ FOI DERROTADO 🔥</p>
+          <p>PONTUAÇÃO FINAL: <span class="score" id="finalScore">0</span></p>
+          <p>INIMIGOS RESTANTES: <span id="remainingEnemies">0</span></p>
+          <p>⏰ O INFERNO VENCEU... POR ENQUANTO ⏰</p>
+        </div>
+        <button class="gameover-button" id="restartGameBtn">
+          🔫 RENASCER E VINGAR-SE 🔫
+        </button>
+      </div>
+    </div>
     <script>
       // ==============================  ESTRUTURA DO JOGO  =================================
       // Mapa 20x15 (X horizontal, Y vertical)
-      let mapa = Array(21)
+      let mapY = 15;
+      let mapX = 20;
+      let mapa = Array(mapX + 1)
         .fill()
-        .map(() => Array(16).fill(0));
+        .map(() => Array(mapY + 1).fill(0));
 
       // Status Marine
       let jogadorX = 10,
@@ -417,9 +828,17 @@
       const weaponArtImg = document.getElementById("weaponArtPanel"); // Agora é uma tag <img>
       const resetBtn = document.getElementById("resetBtn");
 
+      const gameoverScreen = document.getElementById("gameoverScreen");
+      const finalScoreSpan = document.getElementById("finalScore");
+      const remainingEnemiesSpan = document.getElementById("remainingEnemies");
+      const restartGameBtn = document.getElementById("restartGameBtn");
+
       // células de desenho (tamanho 30x30)
       const CELL_W = 30;
       const CELL_H = 30;
+
+      let canvaW = document.querySelector("canvas").width;
+      let canvaH = document.querySelector("canvas").height;
 
       // ----------  ARTE DAS ARMAS (IMAGENS)  ----------
       const armasArt = {
@@ -480,19 +899,19 @@
         limparArte();
 
         // 1. Limpar mapa (chão 0)
-        for (let x = 1; x <= 20; x++) {
-          for (let y = 1; y <= 15; y++) {
+        for (let x = 1; x <= mapX; x++) {
+          for (let y = 1; y <= mapY; y++) {
             mapa[x][y] = 0;
           }
         }
         // 2. Paredes bordas
-        for (let x = 1; x <= 20; x++) {
+        for (let x = 1; x <= mapX; x++) {
           mapa[x][1] = 1;
-          mapa[x][15] = 1;
+          mapa[x][mapY] = 1;
         }
-        for (let y = 1; y <= 15; y++) {
+        for (let y = 1; y <= mapY; y++) {
           mapa[1][y] = 1;
-          mapa[20][y] = 1;
+          mapa[mapX][y] = 1;
         }
         // 3. Obstáculos internos (labirinto)
         mapa[5][5] = 1;
@@ -526,18 +945,69 @@
       }
 
       function atualizarUI() {
+        // Animação de dano na vida
+        const vidaElement = document.getElementById("vidaVal");
+        if (vidaElement && parseInt(vidaElement.innerText) > vida) {
+          vidaElement.style.animation = "damageNumber 0.3s ease-in-out";
+          setTimeout(() => {
+            vidaElement.style.animation = "";
+          }, 300);
+        }
+
         vidaSpan.innerText = vida;
         municaoSpan.innerText = municao;
         pontuacaoSpan.innerText = pontuacao;
         inimigosSpan.innerText = contadorInimigos;
+
+        // Efeito de perigo quando vida baixa
+        if (vida <= 30 && vida > 0) {
+          vidaElement.style.animation = "pulseRed 0.5s ease-in-out infinite";
+        } else if (vidaElement) {
+          vidaElement.style.animation = "";
+        }
       }
+
+      // Adicionar keyframe para dano no número
+      const damageNumberStyle = document.createElement("style");
+      damageNumberStyle.textContent = `
+  @keyframes damageNumber {
+    0% { transform: scale(1); color: #f0e6a0; }
+    50% { transform: scale(1.3); color: #ff0000; text-shadow: 0 0 5px rgba(255,0,0,0.8); }
+    100% { transform: scale(1); color: #f0e6a0; }
+  }
+`;
+      document.head.appendChild(damageNumberStyle);
+      const imagens = {};
+      const arquivos = {
+        marine: "./img/doom-avatar.jpg",
+        demon: "./img/enemy.png",
+      };
+      let imagensCarregadas = 0;
+      const totalImagens = Object.keys(arquivos).length;
+      function loadImages() {
+        for (let chave in arquivos) {
+          imagens[chave] = new Image();
+          imagens[chave].src = arquivos[chave];
+
+          imagens[chave].onload = () => {
+            imagensCarregadas++;
+            if (imagensCarregadas === totalImagens) {
+              inicializarJogo();
+            }
+          };
+          imagens[chave].onerror = function () {
+            console.error("Erro ao carregar a imagem: " + arquivos[chave]);
+          };
+        }
+      }
+      loadImages();
 
       // =========================  RENDER CANVAS ESTILO DOOM ==========================
       function desenharMapa() {
         if (!jogoAtivo) return;
-        ctx.clearRect(0, 0, 600, 450);
-        for (let y = 1; y <= 15; y++) {
-          for (let x = 1; x <= 20; x++) {
+        ctx.clearRect(0, 0, canvaW, canvaH);
+        for (let y = 1; y <= mapY; y++) {
+          for (let x = 1; x <= mapX; x++) {
             let tile = mapa[x][y];
             let px = (x - 1) * CELL_W;
             let py = (y - 1) * CELL_H;
@@ -551,18 +1021,22 @@
               ctx.fillRect(px + 4, py + 4, CELL_W - 9, CELL_H - 9);
             } else if (tile === 2) {
               // Marine
-              ctx.fillStyle = "#2c6e2c";
-              ctx.fillRect(px, py, CELL_W - 1, CELL_H - 1);
-              ctx.fillStyle = "#7ac76a";
-              ctx.font = `bold ${CELL_W - 8}px monospace`;
-              ctx.fillText("🪖", px + 4, py + 24);
+              ctx.drawImage(
+                imagens.marine,
+                px + 1,
+                py + 1,
+                CELL_W + 5,
+                CELL_H + 5,
+              );
             } else if (tile === 3) {
               // Monstro
-              ctx.fillStyle = "#8b3c2c";
-              ctx.fillRect(px, py, CELL_W - 1, CELL_H - 1);
-              ctx.fillStyle = "#e05a3a";
-              ctx.font = `${CELL_W - 6}px monospace`;
-              ctx.fillText("M", px + 8, py + 24);
+              ctx.drawImage(
+                imagens.demon,
+                px + 1,
+                py + 1,
+                CELL_W + 5,
+                CELL_H + 5,
+              );
             } else {
               ctx.fillStyle = "#120e0a";
               ctx.fillRect(px, py, CELL_W - 1, CELL_H - 1);
@@ -574,8 +1048,112 @@
         // bordas
         ctx.strokeStyle = "#b87c4f";
         ctx.lineWidth = 2;
-        ctx.strokeRect(0, 0, 600, 450);
+        ctx.strokeRect(0, 0, canvaW, canvaH);
       }
+
+      function aplicarEfeitoDano() {
+        // Overlay de dano
+        const damageOverlay = document.getElementById("damageOverlay");
+        if (!damageOverlay) return;
+
+        // Ativar overlay
+        damageOverlay.classList.add("active");
+
+        // Criar efeito de shake na tela
+        document.body.classList.add("shake-active");
+
+        // Criar efeito de pulso vermelho
+        const redPulse = document.createElement("div");
+        redPulse.className = "red-pulse";
+        document.body.appendChild(redPulse);
+
+        // Remover efeitos após animação
+        setTimeout(() => {
+          damageOverlay.classList.remove("active");
+          document.body.classList.remove("shake-active");
+          document
+            .querySelector(".game-container")
+            .classList.add("shake-camera");
+          if (redPulse && redPulse.parentNode) {
+            redPulse.parentNode.removeChild(redPulse);
+          }
+        }, 300);
+
+        // Criar partículas de sangue adicionais
+        criarParticulasSangue();
+      }
+
+      function criarParticulasSangue() {
+        const container = document.querySelector(".game-container");
+        if (!container) return;
+
+        // Criar várias partículas de sangue
+        for (let i = 0; i < 15; i++) {
+          const particula = document.createElement("div");
+          particula.style.position = "absolute";
+          particula.style.width = Math.random() * 8 + 4 + "px";
+          particula.style.height = Math.random() * 8 + 4 + "px";
+          particula.style.backgroundColor = `rgba(139, ${Math.random() * 50}, 0, ${Math.random() * 0.7 + 0.3})`;
+          particula.style.borderRadius = "50%";
+          particula.style.left = Math.random() * 100 + "%";
+          particula.style.top = Math.random() * 100 + "%";
+          particula.style.pointerEvents = "none";
+          particula.style.zIndex = "1001";
+          particula.style.animation = `floatBlood ${Math.random() * 1 + 0.5}s ease-out forwards`;
+
+          container.appendChild(particula);
+
+          // Remover partícula após animação
+          setTimeout(() => {
+            if (particula.parentNode)
+              particula.parentNode.removeChild(particula);
+          }, 500);
+        }
+      }
+
+      // Adicionar keyframe para a animação de flutuação
+      const style = document.createElement("style");
+      style.textContent = `
+  @keyframes floatBlood {
+    0% {
+      transform: translate(0, 0) scale(1);
+      opacity: 1;
+    }
+    100% {
+      transform: translate(${Math.random() * 100 - 50}px, ${Math.random() * 100 - 50}px) scale(0);
+      opacity: 0;
+    }
+  }
+`;
+      document.head.appendChild(style);
+
+      // Função para atualizar a UI com efeito visual quando a vida baixa
+      function atualizarUIComEfeito() {
+        atualizarUI();
+
+        // Efeito de perigo quando vida está baixa
+        if (vida <= 30 && vida > 0) {
+          const vidaElement = document.getElementById("vidaVal");
+          if (vidaElement) {
+            vidaElement.style.animation = "pulseRed 0.5s ease-in-out infinite";
+          }
+        } else {
+          const vidaElement = document.getElementById("vidaVal");
+          if (vidaElement) {
+            vidaElement.style.animation = "";
+          }
+        }
+      }
+
+      // Adicionar keyframe para pulso vermelho
+      const pulseStyle = document.createElement("style");
+      pulseStyle.textContent = `
+  @keyframes pulseRed {
+    0%, 100% { color: #f0e6a0; text-shadow: 0 0 0px rgba(255,0,0,0); }
+    50% { color: #ff0000; text-shadow: 0 0 10px rgba(255,0,0,0.8); }
+  }
+`;
+      document.head.appendChild(pulseStyle);
 
       // =========================  MOVIMENTAÇÃO DOS DEMÔNIOS (IA) ==========================
       function moverDemonios() {
@@ -604,17 +1182,19 @@
           }
 
           // limites e colisões
-          if (proxX >= 1 && proxX <= 20 && proxY >= 1 && proxY <= 15) {
+          if (proxX >= 1 && proxX <= mapX && proxY >= 1 && proxY <= mapY) {
             // Se inimigo encontra o jogador = dano
             if (proxX === jogadorX && proxY === jogadorY) {
               vida -= 10;
               addLog(`💔 Demônio te acertou! Vida: ${vida}`);
-              atualizarUI();
+              // ADICIONE ESTA LINHA:
+              aplicarEfeitoDano(); // Efeito visual de dano
+              atualizarUIComEfeito(); // Atualiza UI com efeito
               if (vida <= 0) {
                 finalizarJogo(false);
                 return;
               }
-              continue; // não se move, apenas causa dano
+              continue;
             }
             // se célula vazia (0) pode mover
             if (mapa[proxX][proxY] === 0) {
@@ -629,86 +1209,6 @@
         }
         desenharMapa();
       }
-
-      // =========================  SISTEMA DE TIRO (HERDADO DO PORTUGOL) ==========================
-      function executarDisparo(direcao) {
-        if (!jogoAtivo) return false;
-        if (municao <= 0) {
-          addLog(
-            "🔇 SEM MUNIÇÃO! Procure matar demônios para ganhar balas (+2 por abate).",
-          );
-          return false;
-        }
-        if (!armaSelecionadaTemp) {
-          addLog("ERRO: nenhuma arma selecionada, tente novamente.");
-          return false;
-        }
-
-        // Gasta munição
-        municao--;
-        let tiroX = jogadorX;
-        let tiroY = jogadorY;
-        let alvoAtingido = false;
-        let dir = direcao.toLowerCase();
-
-        while (
-          tiroX > 1 &&
-          tiroX < 20 &&
-          tiroY > 1 &&
-          tiroY < 15 &&
-          !alvoAtingido
-        ) {
-          if (dir === "w") tiroY--;
-          else if (dir === "s") tiroY++;
-          else if (dir === "a") tiroX--;
-          else if (dir === "d") tiroX++;
-          else break;
-
-          // Parede?
-          if (mapa[tiroX][tiroY] === 1) {
-            addLog(`💥 Tiro acertou uma parede!`);
-            alvoAtingido = true;
-            break;
-          }
-          // Acertou monstro?
-          if (mapa[tiroX][tiroY] === 3) {
-            // encontrar qual inimigo
-            for (let i = 1; i <= 6; i++) {
-              if (
-                inimigoVivo[i] &&
-                inimigoX[i] === tiroX &&
-                inimigoY[i] === tiroY
-              ) {
-                inimigoVivo[i] = false;
-                contadorInimigos--;
-                pontuacao += 100;
-                municao += 2; // recompensa por carnificina
-                mapa[tiroX][tiroY] = 0;
-                addLog(
-                  `🔥 MONSTRO ABATIDO! +100 pontos, +2 munição. Restam ${contadorInimigos} inimigos.`,
-                );
-                atualizarUI();
-                alvoAtingido = true;
-                break;
-              }
-            }
-            break;
-          }
-        }
-        if (!alvoAtingido)
-          addLog(
-            `🔫 Disparo na direção ${direcao.toUpperCase()} ecoou no vazio.`,
-          );
-        atualizarUI();
-
-        // Verifica vitória
-        if (contadorInimigos <= 0) {
-          finalizarJogo(true);
-          return true;
-        }
-        return true;
-      }
-
       // =========================  FLUXO DE TIRO COM ARTE E ESCOLHA ==========================
       function iniciarSequenciaTiro() {
         if (!jogoAtivo) return;
@@ -812,9 +1312,9 @@
         let novoY = jogadorY + dy;
         if (
           novoX >= 1 &&
-          novoX <= 20 &&
+          novoX <= mapX &&
           novoY >= 1 &&
-          novoY <= 15 &&
+          novoY <= mapY &&
           mapa[novoX][novoY] === 0
         ) {
           // limpa posição antiga
@@ -864,7 +1364,7 @@
 
           ctx.beginPath();
           ctx.arc(px + CELL_W / 2, py + CELL_H / 2, raio * 0.6, 0, Math.PI * 2);
-          ctx.fillStyle = `rgba(255, 255, ${100 - frames * 30}, ${0.9 - intensidade})`;
+          ctx.fillStyle = `rgba(255, 255, ${100 - frames * mapX}, ${0.9 - intensidade})`;
           ctx.fill();
 
           ctx.restore();
@@ -884,7 +1384,13 @@
 
             // Verifica se está dentro do círculo de explosão
             const distancia = Math.sqrt(dx * dx + dy * dy);
-            if (distancia <= raio && x >= 1 && x <= 20 && y >= 1 && y <= 15) {
+            if (
+              distancia <= raio &&
+              x >= 1 &&
+              x <= mapX &&
+              y >= 1 &&
+              y <= mapY
+            ) {
               // Remove paredes (valor 1) e transforma em chão (0)
               if (mapa[x][y] === 1) {
                 mapa[x][y] = 0;
@@ -964,7 +1470,7 @@
           let dir = direcao.toLowerCase();
 
           // Move o projetil até o alvo ou parede
-          while (tiroX > 1 && tiroX < 20 && tiroY > 1 && tiroY < 15) {
+          while (tiroX > 1 && tiroX < mapX && tiroY > 1 && tiroY < mapY) {
             if (dir === "w") tiroY--;
             else if (dir === "s") tiroY++;
             else if (dir === "a") tiroX--;
@@ -1020,9 +1526,9 @@
 
         while (
           tiroX > 1 &&
-          tiroX < 20 &&
+          tiroX < mapX &&
           tiroY > 1 &&
-          tiroY < 15 &&
+          tiroY < mapY &&
           !alvoAtingido
         ) {
           if (dir === "w") tiroY--;
@@ -1084,28 +1590,9 @@
         cancelarModoTiro();
 
         if (vida <= 0) {
-          addLog(`GAME OVER! Sua alma agora pertenche ao inferno.`);
-
-          // Mostrar imagem da caveira quando perder
-          const caveiraImg = document.createElement("img");
-          caveiraImg.src = "./img/caveira.jpg";
-          caveiraImg.style.maxWidth = "100%";
-          caveiraImg.style.maxHeight = "200px";
-          caveiraImg.style.objectFit = "contain";
-          caveiraImg.style.margin = "10px auto";
-          caveiraImg.style.display = "block";
-          caveiraImg.style.borderRadius = "8px";
-
-          // Adicionar ao logArea ou à área de armas
-          const imgContainer = document.createElement("div");
-          imgContainer.style.textAlign = "center";
-          imgContainer.appendChild(caveiraImg);
-          logArea.appendChild(imgContainer);
-
-          addLog(`⚰️  SCORE FINAL: ${pontuacao}  ⚰️`);
-
-          // Scroll para ver a imagem
-          imgContainer.scrollIntoView({ behavior: "smooth", block: "nearest" });
+          addLog(`💀 GAME OVER! Sua alma pertence ao inferno. 💀`);
+          addLog(`⚰️ SCORE FINAL: ${pontuacao} ⚰️`);
+          mostrarTelaGameOver(); // Mostra a tela estilizada
         } else if (vitoria || contadorInimigos === 0) {
           addLog(`🌟🌟🌟 GRANDE VITORIA, MARINE! A BASE ESTA SEGURA. 🌟🌟🌟`);
           addLog(`🏆 SCORE FINAL: ${pontuacao}  🏆`);
@@ -1114,6 +1601,38 @@
         // mensagem final
         addLog("🔄 Pressione [RENASCER] para uma nova batalha.");
       }
+
+      // Função para mostrar tela de Game Over
+      function mostrarTelaGameOver() {
+        finalScoreSpan.innerText = pontuacao;
+        remainingEnemiesSpan.innerText = contadorInimigos;
+        gameoverScreen.classList.add("show");
+
+        // Tocar efeito sonoro (opcional - só se quiser)
+        const audio = new Audio(
+          "data:audio/wav;base64,U3RlYWx0aCBzb3VuZCBub3QgYXZhaWxhYmxl",
+        );
+        audio.play().catch((e) => console.log("Áudio não disponível"));
+      }
+
+      // Função para esconder tela de Game Over
+      function esconderTelaGameOver() {
+        gameoverScreen.classList.remove("show");
+        setTimeout(() => {
+          gameoverScreen.style.display = "none";
+        }, 800);
+      }
+
+      restartGameBtn.addEventListener("click", () => {
+        esconderTelaGameOver();
+        inicializarJogo();
+        jogoAtivo = true;
+        esperandoInput = false;
+        aguardandoArma = false;
+        aguardandoDirecao = false;
+        addLog("🔁 RENASCIDO DAS CINZAS! O inferno treme novamente.");
+        desenharMapa();
+      });
 
       // =========================  EVENTOS DE TECLADO ==========================
       function handleKeyDown(e) {
