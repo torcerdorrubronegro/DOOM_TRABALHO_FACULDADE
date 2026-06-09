@@ -346,7 +346,7 @@
 
           &.fases-exploracao {
             width: 520px;
-            min-height: 280px;
+            min-height: 180px;
           }
 
           .tutorial-id {
@@ -1903,6 +1903,102 @@
       }
     }
 
+    .menu-pause {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0, 0, 0, 0.8);
+      display: none;
+      z-index: 2000;
+      backdrop-filter: blur(3px);
+      animation: pauseDown 0.5s ease;
+
+      .pause-content {
+        margin: auto;
+        background: repeating-linear-gradient(135deg,
+            rgba(0, 0, 0, 0.7) 0px,
+            rgba(20, 10, 10, 0.7) 2px,
+            rgba(0, 0, 0, 0.7) 4px);
+        border: 3px solid #8b0000;
+        box-shadow:
+          0 0 30px rgba(139, 0, 0, 0.5),
+          inset 0 0 20px rgba(139, 0, 0, 0.3);
+        backdrop-filter: blur(8px);
+        border-radius: 8px;
+        padding: 30px;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        gap: 20px;
+
+        h2 {
+          font-size: 2.5rem;
+          letter-spacing: 6px;
+          text-align: center;
+          font-family: "Jersey 25", "Doom", monospace;
+          text-transform: uppercase;
+          font-weight: 900;
+          filter: drop-shadow(5px 5px 0px #000000);
+          margin: 0;
+          color: #ddd;
+        }
+
+        .pause-buttons {
+          display: flex;
+          width: 100%;
+          justify-content: space-evenly;
+          align-items: stretch;
+          flex-direction: column;
+        }
+
+        .pause-btn {
+
+          border: 6px groove #8b0000;
+          border-radius: 4px;
+          background: linear-gradient(180deg, #2a0a0a 0%, #0a0000 100%);
+          color: #cdcdcd;
+          /* Branco acinzentado por padrão */
+          padding: 12px 32px;
+          transition: all 0.3s ease;
+          cursor: pointer;
+          margin-top: 10px;
+          box-shadow: 0 4px 10px rgba(0, 0, 0, 0.5);
+          font-family: "Jersey 25", "Science Gothic", monospace;
+          font-size: 1.4em;
+
+          &:hover {
+            box-shadow: 0 0 15px rgba(139, 0, 0, 0.4);
+            border-color: #ff0000cc;
+            color: #fff;
+          }
+
+          span {
+            font-size: 1.3rem;
+            font-family: "Science Gothic", monospace;
+            font-weight: bold;
+            background: linear-gradient(180deg, #ff3333 0%, #cc0000 100%);
+            -webkit-background-clip: text;
+            background-clip: text;
+            -webkit-text-fill-color: transparent;
+          }}
+      }
+    }
+
+    @keyframes pauseDown {
+      0% {
+        transform: translateY(-100%);
+        opacity: 0;
+      }
+
+      100% {
+        transform: translateY(0);
+        opacity: 1;
+      }
+    }
+
     @keyframes overDoom {
       0% {
         transform: translateY(-100%);
@@ -2147,31 +2243,17 @@
         <div class="tutorial-card fases-exploracao">
           <div class="tutorial-id">5</div>
           <div class="tutorial-title">
-            <h2>Exploração de Setores e Cartões de Acesso</h2>
+            <h2>Objetivo do Jogo</h2>
           </div>
           <div class="tutorial-content combat-layout objective-layout">
             <div class="objective-text">
               <p>
-                <strong>Laboratórios e Labirintos:</strong> Cada nível esconde segredos,
-                hordas de demônios e caminhos trancados por portas de segurança máxima da UAC.
-              </p>
-              <p>
-                <strong>O Keycard Vermelho:</strong> A saída de emergência estará lacrada.
-                Sua missão principal é explorar o setor para localizar o
-                <strong style="color: #ff3333;">Keycard Vermelho (Cartão de Acesso)</strong>.
-                Sem ele, é impossível abrir o interruptor de saída.
-              </p>
-            </div>
-            <div class="damage-system-box">
-              <h3>RISCO AMBIENTAL:</h3>
-              <p>
-                Cuidado com poças de <strong>Ácido Verde / Toxinas</strong>.
-                Atravessá-las corrói sua armadura e drena sua vida rapidamente!
+                <strong>Demônios e Saída:</strong> Cada nível possui um mapa diferente com uma saída e diversos inimigos. O objetivo é encontrar a saída, matando a
+                hordas de demônios.
               </p>
             </div>
           </div>
         </div>
-
         <div class="tutorial-buttons-actions" id="buttonsActions">
           <button class="btn-tutorial-action" id="btnActionBack">Voltar</button>
           <button class="btn-tutorial-action" id="btnActionProceed">Continuar</button>
@@ -2348,6 +2430,17 @@
     </div>
   </div>
 
+  <div class="menu-pause" id="menuPause">
+    <div class="pause-content">
+      <h2>Jogo Pausado</h2>
+      <div class="pause-buttons">
+        <button id="resumeButton" class="pause-btn">Retomar</button>
+        <button id="restartButton" class="pause-btn">Reiniciar</button>
+        <button id="mainMenuButton" class="pause-btn">Menu Principal</button>
+      </div>
+    </div>
+  </div>
+
   <script>
     // Mapa 20x15 (X horizontal, Y vertical)
     let mapX = 20;
@@ -2415,7 +2508,7 @@
     let canvaH;
     let projetilAtivo = null;
     let explosaoAtiva = null;
-
+    let offscreenCanvas, offscreenCtx;
     // Elementos DOM
     const objetivoTextoDinamico = document.getElementById("objetivoTextoDinamico");
     const canvas = document.getElementById("doomCanvas");
@@ -2434,6 +2527,10 @@
     const introCharacterContainer = document.getElementById(
       "introCharacterContainer",
     );
+    const menuPause = document.getElementById("menuPause");
+    const resumeButton = document.getElementById("resumeButton");
+    const restartButton = document.getElementById("restartButton");
+    const mainMenuButton = document.getElementById("mainMenuButton");
     const scoreValue = document.getElementById("score-value");
     const alvosValue = document.getElementById("alvos-value");
     const timeValue = document.getElementById("time-value");
@@ -2482,7 +2579,7 @@
           { x: 7, y: 4, tipo: "municao" },
           { x: 13, y: 12, tipo: "municao" },
         ],
-        saida: { x: 20, y: 8},
+        saida: { x: 20, y: 8 },
       },
 
       2: {
@@ -2522,7 +2619,7 @@
           { x: 5, y: 11, tipo: "municao" },
           { x: 15, y: 12, tipo: "municao" },
         ],
-        saida: { x: 20, y: 8 },  
+        saida: { x: 20, y: 8 },
       },
 
       // FASE 3: SALA DO BOSS (ARENA + CHEFÃO)
@@ -2571,7 +2668,7 @@
           { x: 7, y: 11, tipo: "municao" },
           { x: 13, y: 11, tipo: "municao" },
         ],
-        saida: { x: 20, y: 8 },  
+        saida: { x: 20, y: 8 },
       },
     };
     const ITENS_CONFIG = {
@@ -3250,7 +3347,6 @@
         if (Math.hypot(posX - x, posY - y) > Math.max(mapX, mapY) * 2) break;
       }
 
-      desenharMapa();
       verificarFimJogo();
     }
     // Tiro penetrante (Chaingun)
@@ -3299,7 +3395,6 @@
       }
 
       if (mortos > 0) addLog(`Tiro penetrante matou ${mortos} inimigo(s)!`);
-      desenharMapa();
       atualizarUI();
       verificarFimJogo();
     }
@@ -3384,12 +3479,12 @@
               let px = alvoX + dx, py = alvoY + dy;
               if (px >= 1 && px <= mapX && py >= 1 && py <= mapY && mapa[px][py] === 1) {
                 mapa[px][py] = 0;
+                atualizarCelulaOffscreen(px, py);
               }
             }
           }
 
           addLog(`💥 Explosão! ${mortos} inimigo(s) morto(s)`);
-          desenharMapa();
           atualizarUI();
           verificarFimJogo();
           return;
@@ -3409,7 +3504,7 @@
           rastro: [...rastro]
         };
 
-        desenharMapa();
+        // desenharMapa();
       }, 35);
 
     }
@@ -3466,7 +3561,7 @@
         if (!jogoAtivo || frames >= maxFrames) {
           clearInterval(anim);
           explosaoAtiva = null; // Desativa a explosão
-          desenharMapa();
+          // desenharMapa();
           return;
         }
 
@@ -3504,7 +3599,7 @@
         };
 
         frames++;
-        desenharMapa();
+        // desenharMapa();
       }, 50);
     }
     function desenharFlashTiro() {
@@ -3649,7 +3744,6 @@
           moverInimigo(i);
         }
       }
-      desenharMapa();
     }
 
     function moverInimigo(idx) {
@@ -3740,19 +3834,19 @@
       }, 50);
     }
 
-    function desenharMapa() {
-      if (!jogoAtivo) return;
-      ctx.clearRect(0, 0, canvaW, canvaH);
-      ctx.save();
-
-      if (explosaoAtiva && explosaoAtiva.frames < 8) {
-        let força = 8 - explosaoAtiva.frames;
-        let shakeX = (Math.random() - 0.5) * força;
-        let shakeY = (Math.random() - 0.5) * força;
-        ctx.translate(shakeX, shakeY);
+    function renderizarMapaEstatico() {
+      // Cria o canvas offscreen se ainda não existir
+      if (!offscreenCanvas) {
+        offscreenCanvas = document.createElement('canvas');
+        offscreenCanvas.width = canvaW;
+        offscreenCanvas.height = canvaH;
+        offscreenCtx = offscreenCanvas.getContext('2d');
       }
 
-      // Desenha as Paredes e o Chão (vão tremer corretamente agora)
+      // Limpa o canvas offscreen
+      offscreenCtx.clearRect(0, 0, canvaW, canvaH);
+
+      // Desenha todas as células estáticas: chão, paredes e saída
       for (let y = 1; y <= mapY; y++) {
         for (let x = 1; x <= mapX; x++) {
           let tile = mapa[x][y];
@@ -3760,153 +3854,201 @@
           let py = (y - 1) * CELL_H;
 
           if (tile === 1) {
-            ctx.fillStyle = "#3c2a23";
-            ctx.fillRect(px, py, CELL_W - 1, CELL_H - 1);
-            ctx.fillStyle = "#5e3e2c";
-            ctx.fillRect(px + 2, py + 2, CELL_W - 5, CELL_H - 5);
-            ctx.fillStyle = "#1f140e";
-            ctx.fillRect(px + 4, py + 4, CELL_W - 9, CELL_H - 9);
+            // Desenho da parede (copiado do seu código original)
+            offscreenCtx.fillStyle = "#3c2a23";
+            offscreenCtx.fillRect(px, py, CELL_W - 1, CELL_H - 1);
+            offscreenCtx.fillStyle = "#5e3e2c";
+            offscreenCtx.fillRect(px + 2, py + 2, CELL_W - 5, CELL_H - 5);
+            offscreenCtx.fillStyle = "#1f140e";
+            offscreenCtx.fillRect(px + 4, py + 4, CELL_W - 9, CELL_H - 9);
+          } else if (tile === 5) {
+            // Desenho da saída (agora no offscreenCtx)
+            offscreenCtx.shadowBlur = 0;
+            const centroX = px + CELL_W / 2;
+            const centroY = py + CELL_H / 2;
+            offscreenCtx.fillStyle = "#1c1c1c";
+            offscreenCtx.fillRect(px, py, CELL_W - 1, CELL_H - 1);
+            offscreenCtx.fillStyle = "#2d2d2d";
+            offscreenCtx.fillRect(px + 3, py + 3, CELL_W - 7, CELL_H - 7);
+            offscreenCtx.fillStyle = "#cca000";
+            offscreenCtx.fillRect(px + 3, py + 3, CELL_W - 7, 5);
+            offscreenCtx.fillRect(px + 3, py + CELL_H - 9, CELL_W - 7, 5);
+            offscreenCtx.fillStyle = "#111111";
+            for (let i = 4; i < CELL_W - 6; i += 8) {
+              offscreenCtx.beginPath();
+              offscreenCtx.moveTo(px + i, py + 3);
+              offscreenCtx.lineTo(px + i + 4, py + 8);
+              offscreenCtx.lineTo(px + i + 2, py + 8);
+              offscreenCtx.lineTo(px + i - 2, py + 3);
+              offscreenCtx.fill();
+              offscreenCtx.beginPath();
+              offscreenCtx.moveTo(px + i - 2, py + CELL_H - 9);
+              offscreenCtx.lineTo(px + i + 2, py + CELL_H - 4);
+              offscreenCtx.lineTo(px + i, py + CELL_H - 4);
+              offscreenCtx.lineTo(px + i - 4, py + CELL_H - 9);
+              offscreenCtx.fill();
+            }
+            offscreenCtx.fillStyle = "#0f120e";
+            offscreenCtx.fillRect(centroX - 12, centroY - 8, 24, 18);
+            offscreenCtx.fillStyle = "#3a4039";
+            offscreenCtx.fillRect(centroX - 11, centroY - 7, 22, 16);
+            offscreenCtx.fillStyle = "#1b1f1a";
+            offscreenCtx.fillRect(centroX - 9, centroY - 5, 18, 12);
+            offscreenCtx.fillStyle = "#7a0f0f";
+            offscreenCtx.fillRect(centroX - 6, centroY - 3, 12, 8);
+            offscreenCtx.fillStyle = "#dc2424";
+            offscreenCtx.fillRect(centroX - 6, centroY - 3, 12, 6);
+            offscreenCtx.fillStyle = "#ff666b";
+            offscreenCtx.fillRect(centroX - 5, centroY - 3, 10, 2);
+            offscreenCtx.fillStyle = "#00ff00";
+            offscreenCtx.fillRect(centroX - 15, centroY - 3, 2, 2);
+            offscreenCtx.fillStyle = "#4a0000";
+            offscreenCtx.fillRect(centroX - 15, centroY + 1, 2, 2);
+            offscreenCtx.fillStyle = "#ff3333";
+            offscreenCtx.font = "bold 10px monospace";
+            offscreenCtx.textAlign = "center";
+            offscreenCtx.imageSmoothingEnabled = false;
+            offscreenCtx.fillText("EXIT", centroX, centroY - 11);
           } else {
-            ctx.fillStyle = "#120e0a";
-            ctx.fillRect(px, py, CELL_W - 1, CELL_H - 1);
-            ctx.fillStyle = "#2f2a1f";
-            ctx.fillRect(px + 1, py + 1, CELL_W - 3, CELL_H - 3);
-
-            if (tile === 4) {
-              let itemEncontrado = itensMapa.find((item) => item.x === x && item.y === y && !item.coletado);
-              if (itemEncontrado && itemEncontrado.tipo === "municao") {
-                ctx.shadowBlur = 0;
-                ctx.fillStyle = "#0f140d";
-                ctx.fillRect(px + CELL_W / 2 - 14, py + CELL_H / 2 - 11, 28, 22);
-                ctx.fillStyle = "#222b1f";
-                ctx.fillRect(px + CELL_W / 2 - 4, py + CELL_H / 2 - 4, 19, 14);
-                ctx.fillStyle = "#3a4735";
-                ctx.fillRect(px + CELL_W / 2 - 4, py + CELL_H / 2 - 8, 18, 14);
-                ctx.fillStyle = "#596d52";
-                ctx.fillRect(px + CELL_W / 2 - 5, py + CELL_H / 2 - 10, 19, 3);
-                ctx.fillStyle = "#2a3326";
-                ctx.fillRect(px + CELL_W / 2 - 4, py + CELL_H / 2 - 7, 18, 1);
-                ctx.fillStyle = "#525950";
-                ctx.fillRect(px + CELL_W / 2 + 2, py + CELL_H / 2 - 2, 7, 6);
-                ctx.fillStyle = "#707a6e";
-                ctx.fillRect(px + CELL_W / 2 + 3, py + CELL_H / 2 - 2, 5, 2);
-                ctx.fillStyle = "#1b1f1a";
-                ctx.fillRect(px + CELL_W / 2 + 4, py + CELL_H / 2 + 1, 3, 2);
-                ctx.fillStyle = "#141a12";
-                ctx.fillRect(px + CELL_W / 2 - 13, py + CELL_H / 2 - 7, 9, 15);
-                ctx.fillStyle = "#293326";
-                ctx.fillRect(px + CELL_W / 2 - 13, py + CELL_H / 2 + 4, 9, 4);
-                ctx.fillStyle = "#cca025";
-                ctx.fillRect(px + CELL_W / 2 - 12, py + CELL_H / 2 - 5, 7, 2);
-                ctx.fillStyle = "#9c1c1c";
-                ctx.fillRect(px + CELL_W / 2 - 12, py + CELL_H / 2 - 3, 7, 6);
-                ctx.fillStyle = "#e63c3c";
-                ctx.fillRect(px + CELL_W / 2 - 12, py + CELL_H / 2 - 1, 2, 3);
-                ctx.fillRect(px + CELL_W / 2 - 8, py + CELL_H / 2 - 1, 2, 3);
-                ctx.fillRect(px + CELL_W / 2 - 5, py + CELL_H / 2 - 2, 1, 4);
-                ctx.fillStyle = "#b37422";
-                ctx.fillRect(px + CELL_W / 2 - 11, py + CELL_H / 2 + 3, 1, 1);
-                ctx.fillRect(px + CELL_W / 2 - 7, py + CELL_H / 2 + 3, 1, 1);
-                ctx.fillStyle = "#0f140d";
-                ctx.fillRect(px + CELL_W / 2 - 10, py + CELL_H / 2 - 5, 1, 9);
-                ctx.fillRect(px + CELL_W / 2 - 6, py + CELL_H / 2 - 5, 1, 9);
-                ctx.fillStyle = "rgba(255, 255, 255, 0.15)";
-                ctx.fillRect(px + CELL_W / 2 - 4, py + CELL_H / 2 - 10, 4, 3);
-              }
-            } else if (tile === 5) {
-              ctx.shadowBlur = 0;
-              const centroX = px + CELL_W / 2;
-              const centroY = py + CELL_H / 2;
-              ctx.fillStyle = "#1c1c1c";
-              ctx.fillRect(px, py, CELL_W - 1, CELL_H - 1);
-              ctx.fillStyle = "#2d2d2d";
-              ctx.fillRect(px + 3, py + 3, CELL_W - 7, CELL_H - 7);
-              ctx.fillStyle = "#cca000";
-              ctx.fillRect(px + 3, py + 3, CELL_W - 7, 5);
-              ctx.fillRect(px + 3, py + CELL_H - 9, CELL_W - 7, 5);
-              ctx.fillStyle = "#111111";
-              for (let i = 4; i < CELL_W - 6; i += 8) {
-                ctx.beginPath();
-                ctx.moveTo(px + i, py + 3);
-                ctx.lineTo(px + i + 4, py + 8);
-                ctx.lineTo(px + i + 2, py + 8);
-                ctx.lineTo(px + i - 2, py + 3);
-                ctx.fill();
-                ctx.beginPath();
-                ctx.moveTo(px + i - 2, py + CELL_H - 9);
-                ctx.lineTo(px + i + 2, py + CELL_H - 4);
-                ctx.lineTo(px + i, py + CELL_H - 4);
-                ctx.lineTo(px + i - 4, py + CELL_H - 9);
-                ctx.fill();
-              }
-              ctx.fillStyle = "#0f120e";
-              ctx.fillRect(centroX - 12, centroY - 8, 24, 18);
-              ctx.fillStyle = "#3a4039";
-              ctx.fillRect(centroX - 11, centroY - 7, 22, 16);
-              ctx.fillStyle = "#1b1f1a";
-              ctx.fillRect(centroX - 9, centroY - 5, 18, 12);
-              ctx.fillStyle = "#7a0f0f";
-              ctx.fillRect(centroX - 6, centroY - 3, 12, 8);
-              ctx.fillStyle = "#dc2424";
-              ctx.fillRect(centroX - 6, centroY - 3, 12, 6);
-              ctx.fillStyle = "#ff666b";
-              ctx.fillRect(centroX - 5, centroY - 3, 10, 2);
-              ctx.fillStyle = "#00ff00";
-              ctx.fillRect(centroX - 15, centroY - 3, 2, 2);
-              ctx.fillStyle = "#4a0000";
-              ctx.fillRect(centroX - 15, centroY + 1, 2, 2);
-              ctx.fillStyle = "#ff3333";
-              ctx.font = "bold 10px monospace";
-              ctx.textAlign = "center";
-              ctx.imageSmoothingEnabled = false;
-              ctx.fillText("EXIT", centroX, centroY - 11);
-            }
-
-            if (tile === 3 && imagens.demon) {
-              ctx.drawImage(imagens.demon, px + 1, py + 1, CELL_W + 5, CELL_H + 5);
-              const inimigo = inimigos.find((inv) => inv.vivo && inv.x === x && inv.y === y);
-              if (inimigo) {
-                const hpPercent = inimigo.hp / inimigo.hpMaximo;
-                const barraWidth = CELL_W - 4;
-                const barraHeight = 5;
-                const barraX = px + 2;
-                const barraY = py - 8;
-                ctx.fillStyle = "#4a0000";
-                ctx.fillRect(barraX, barraY, barraWidth, barraHeight);
-                ctx.fillStyle = hpPercent > 0.6 ? "#00ff00" : hpPercent > 0.3 ? "#ffaa00" : "#ff0000";
-                ctx.fillRect(barraX, barraY, barraWidth * hpPercent, barraHeight);
-                ctx.strokeStyle = "#888888";
-                ctx.lineWidth = 1;
-                ctx.strokeRect(barraX, barraY, barraWidth, barraHeight);
-                ctx.fillStyle = "#ffffff";
-                ctx.font = "bold 9px monospace";
-                ctx.shadowBlur = 0;
-                ctx.fillText(`${inimigo.hp}`, barraX + 2, barraY - 2);
-              }
-            }
+            // Chão padrão (células vazias, 0, 2, 3, 4 serão sobrescritas)
+            offscreenCtx.fillStyle = "#120e0a";
+            offscreenCtx.fillRect(px, py, CELL_W - 1, CELL_H - 1);
+            offscreenCtx.fillStyle = "#2f2a1f";
+            offscreenCtx.fillRect(px + 1, py + 1, CELL_W - 3, CELL_H - 3);
           }
         }
       }
+    }
 
+    function desenharMapa() {
+      if (!jogoAtivo) return;
+
+      ctx.clearRect(0, 0, canvaW, canvaH);
+      ctx.save();
+
+      // Tremor de câmera durante explosões fortes
+      if (explosaoAtiva && explosaoAtiva.frames < 8) {
+        let força = 8 - explosaoAtiva.frames;
+        let shakeX = (Math.random() - 0.5) * força;
+        let shakeY = (Math.random() - 0.5) * força;
+        ctx.translate(shakeX, shakeY);
+      }
+
+      // 1. DESENHA O FUNDO PRÉ-RENDERIZADO (paredes, chão, saída)
+      if (offscreenCanvas) {
+        ctx.drawImage(offscreenCanvas, 0, 0);
+      }
+
+      // 2. DESENHA ITENS (apenas os não coletados)
+      for (let i = 0; i < itensMapa.length; i++) {
+        let item = itensMapa[i];
+        if (item.coletado) continue;
+        let px = (item.x - 1) * CELL_W;
+        let py = (item.y - 1) * CELL_H;
+
+        if (item.tipo === "municao") {
+          // CÓDIGO COMPLETO DE DESENHO DA CAIXA DE MUNIÇÃO (original)
+          ctx.shadowBlur = 0;
+          ctx.fillStyle = "#0f140d";
+          ctx.fillRect(px + CELL_W / 2 - 14, py + CELL_H / 2 - 11, 28, 22);
+          ctx.fillStyle = "#222b1f";
+          ctx.fillRect(px + CELL_W / 2 - 4, py + CELL_H / 2 - 4, 19, 14);
+          ctx.fillStyle = "#3a4735";
+          ctx.fillRect(px + CELL_W / 2 - 4, py + CELL_H / 2 - 8, 18, 14);
+          ctx.fillStyle = "#596d52";
+          ctx.fillRect(px + CELL_W / 2 - 5, py + CELL_H / 2 - 10, 19, 3);
+          ctx.fillStyle = "#2a3326";
+          ctx.fillRect(px + CELL_W / 2 - 4, py + CELL_H / 2 - 7, 18, 1);
+          ctx.fillStyle = "#525950";
+          ctx.fillRect(px + CELL_W / 2 + 2, py + CELL_H / 2 - 2, 7, 6);
+          ctx.fillStyle = "#707a6e";
+          ctx.fillRect(px + CELL_W / 2 + 3, py + CELL_H / 2 - 2, 5, 2);
+          ctx.fillStyle = "#1b1f1a";
+          ctx.fillRect(px + CELL_W / 2 + 4, py + CELL_H / 2 + 1, 3, 2);
+          ctx.fillStyle = "#141a12";
+          ctx.fillRect(px + CELL_W / 2 - 13, py + CELL_H / 2 - 7, 9, 15);
+          ctx.fillStyle = "#293326";
+          ctx.fillRect(px + CELL_W / 2 - 13, py + CELL_H / 2 + 4, 9, 4);
+          ctx.fillStyle = "#cca025";
+          ctx.fillRect(px + CELL_W / 2 - 12, py + CELL_H / 2 - 5, 7, 2);
+          ctx.fillStyle = "#9c1c1c";
+          ctx.fillRect(px + CELL_W / 2 - 12, py + CELL_H / 2 - 3, 7, 6);
+          ctx.fillStyle = "#e63c3c";
+          ctx.fillRect(px + CELL_W / 2 - 12, py + CELL_H / 2 - 1, 2, 3);
+          ctx.fillRect(px + CELL_W / 2 - 8, py + CELL_H / 2 - 1, 2, 3);
+          ctx.fillRect(px + CELL_W / 2 - 5, py + CELL_H / 2 - 2, 1, 4);
+          ctx.fillStyle = "#b37422";
+          ctx.fillRect(px + CELL_W / 2 - 11, py + CELL_H / 2 + 3, 1, 1);
+          ctx.fillRect(px + CELL_W / 2 - 7, py + CELL_H / 2 + 3, 1, 1);
+          ctx.fillStyle = "#0f140d";
+          ctx.fillRect(px + CELL_W / 2 - 10, py + CELL_H / 2 - 5, 1, 9);
+          ctx.fillRect(px + CELL_W / 2 - 6, py + CELL_H / 2 - 5, 1, 9);
+          ctx.fillStyle = "rgba(255, 255, 255, 0.15)";
+          ctx.fillRect(px + CELL_W / 2 - 4, py + CELL_H / 2 - 10, 4, 3);
+        }
+      }
+
+      function atualizarCelulaOffscreen(x, y) {
+        if (!offscreenCtx) return;
+        let px = (x - 1) * CELL_W;
+        let py = (y - 1) * CELL_H;
+        // Redesenha o chão padrão
+        offscreenCtx.fillStyle = "#120e0a";
+        offscreenCtx.fillRect(px, py, CELL_W - 1, CELL_H - 1);
+        offscreenCtx.fillStyle = "#2f2a1f";
+        offscreenCtx.fillRect(px + 1, py + 1, CELL_W - 3, CELL_H - 3);
+      }
+
+      // 3. DESENHA INIMIGOS VIVOS + BARRA DE VIDA
+      for (let i = 0; i < inimigos.length; i++) {
+        let inv = inimigos[i];
+        if (!inv.vivo) continue;
+        let px = (inv.x - 1) * CELL_W;
+        let py = (inv.y - 1) * CELL_H;
+
+        // Sprite do demônio
+        if (imagens.demon) {
+          ctx.drawImage(imagens.demon, px + 1, py + 1, CELL_W + 5, CELL_H + 5);
+        }
+
+        // Barra de vida
+        const hpPercent = inv.hp / inv.hpMaximo;
+        const barraWidth = CELL_W - 4;
+        const barraHeight = 5;
+        const barraX = px + 2;
+        const barraY = py - 8;
+        ctx.fillStyle = "#4a0000";
+        ctx.fillRect(barraX, barraY, barraWidth, barraHeight);
+        ctx.fillStyle = hpPercent > 0.6 ? "#00ff00" : hpPercent > 0.3 ? "#ffaa00" : "#ff0000";
+        ctx.fillRect(barraX, barraY, barraWidth * hpPercent, barraHeight);
+        ctx.strokeStyle = "#888888";
+        ctx.lineWidth = 1;
+        ctx.strokeRect(barraX, barraY, barraWidth, barraHeight);
+        ctx.fillStyle = "#ffffff";
+        ctx.font = "bold 9px monospace";
+        ctx.shadowBlur = 0;
+        ctx.fillText(`${inv.hp}`, barraX + 2, barraY - 2);
+      }
+
+      // 4. DESENHA O JOGADOR
       if (imagens.marine) {
         ctx.drawImage(imagens.marine, playerPixelX, playerPixelY, CELL_W + 5, CELL_H + 5);
       }
 
-      // ====================================================
-      // REPRODUÇÃO DO PROJÉTIL (Com Save/Restore corrigidos)
-      // ====================================================
-
+      // 5. DESENHA PROJÉTIL ATIVO (míssil RPG-7)
       if (projetilAtivo) {
-        ctx.save(); // Salva para a rotação do míssil não quebrar a tela
+        ctx.save();
         let angulo = Math.atan2(projetilAtivo.stepY, projetilAtivo.stepX);
         ctx.translate(projetilAtivo.x, projetilAtivo.y);
         ctx.rotate(angulo);
 
+        // Corpo do míssil
         ctx.fillStyle = "#707a70";
         ctx.fillRect(-6, -3, 14, 6);
         ctx.fillStyle = "#4a524a";
         ctx.fillRect(-6, 1, 14, 2);
 
+        // Ponta vermelha
         ctx.beginPath();
         ctx.moveTo(8, -3);
         ctx.lineTo(14, 0);
@@ -3914,26 +4056,27 @@
         ctx.fillStyle = "#ba2525";
         ctx.fill();
 
+        // Aletas traseiras
         ctx.fillStyle = "#222522";
         ctx.fillRect(-10, -5, 4, 2);
         ctx.fillRect(-10, 3, 4, 2);
 
+        // Chama do foguete
         ctx.beginPath();
         ctx.moveTo(-10, -2);
         ctx.lineTo(-16, 0);
         ctx.lineTo(-10, 2);
         ctx.fillStyle = "rgba(255, 120, 0, 0.9)";
         ctx.fill();
-        ctx.restore(); // Restaura logo após terminar o projétil
+
+        ctx.restore();
       }
 
-      // ====================================================
-      // REPRODUÇÃO DA EXPLOSÃO
-      // ====================================================
-
+      // 6. DESENHA EXPLOSÃO ATIVA
       if (explosaoAtiva) {
         ctx.save();
         let exp = explosaoAtiva;
+        // Bola de fogo inicial
         if (exp.frames < 10) {
           let expansao = exp.frames * 8;
           ctx.beginPath();
@@ -3941,6 +4084,7 @@
           ctx.fillStyle = `rgba(255, ${100 - exp.frames * 20}, 0, ${0.8 - exp.frames * 0.08})`;
           ctx.fill();
         }
+        // Fumaça
         let tamanhoFumaca = 20 + exp.frames * 4;
         for (let i = 0; i < 5; i++) {
           let offsetX = Math.sin(exp.frames * 0.2 + i) * exp.frames * 1.5;
@@ -3950,11 +4094,13 @@
           ctx.fillStyle = `rgba(60, 60, 60, ${0.6 - exp.frames / exp.maxFrames})`;
           ctx.fill();
         }
+        // Partículas
         for (let i = 0; i < exp.particulas.length; i++) {
           let p = exp.particulas[i];
           if (p.vida > 0 && p.tamanho > 0) {
             ctx.beginPath();
             ctx.arc(p.x, p.y, p.tamanho, 0, Math.PI * 2);
+            // Converte a cor HSL para RGBA dinamicamente (simplificado)
             ctx.fillStyle = p.cor.replace("hsl", "rgba").replace("100%", "1").replace("50%", "0.8") + `, ${p.vida})`;
             ctx.fill();
             ctx.shadowBlur = 10;
@@ -3964,14 +4110,18 @@
         }
         ctx.restore();
       }
+
+      // 7. FLASH DE TIRO (animação de disparo)
+      desenharFlashTiro();
+
       ctx.restore();
+
+      // Borda decorativa do canvas
       ctx.strokeStyle = "#b87c4f";
       ctx.lineWidth = 2;
       ctx.strokeRect(0, 0, canvaW, canvaH);
       canvas.style.cursor = "crosshair";
-      desenharFlashTiro();
     }
-
     function carregarFase(fase) {
       // Reseta flags específicas da fase
       temKeycard = false;
@@ -4065,6 +4215,7 @@
 
       atualizarUI();
       desenharMapa();
+      renderizarMapaEstatico();
     }
 
     function exibirTelaFim(config) {
@@ -4128,7 +4279,7 @@
           return;
         }
         addLog("🏆 SAÍDA ENCONTRADA! VOCÊ COMPLETOU A FASE!");
-        inimigosMortosTotal+=inimigosMortosFase;
+        inimigosMortosTotal += inimigosMortosFase;
         exibirTelaFim({
           titulo: "Fase Completa!",
           cor: "#00f5d4",
@@ -4402,7 +4553,8 @@
           break;
         case "q":
         case "Q":
-          finalizarJogo(false);
+          menuPause.style.display = "flex";
+          jogoAtivo = false;
           break;
       }
       if (moved) {
@@ -4493,6 +4645,24 @@
       renderTutorialCard();
       etapaAtual = "tutorial";
     }
+
+    resumeButton.addEventListener("click", () => {
+      menuPause.style.display = "none";
+      jogoAtivo = true;
+      esperandoInput = false;
+      gameLoop();
+    });
+
+    restartButton.addEventListener("click", () => {
+      menuPause.style.display = "none";
+      reiniciarFaseAtual();
+    });
+
+    mainMenuButton.addEventListener("click", () => {
+      menuPause.style.display = "none";
+      voltarAoMenuPrincipal();
+    });
+
     btnStart.addEventListener("click", renderIntro)
     btnTutorial.addEventListener("click", renderTutorial)
 
