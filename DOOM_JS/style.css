@@ -1,0 +1,2236 @@
+@import url("https://fonts.googleapis.com/css2?family=DotGothic16&display=swap");
+@import url("https://fonts.googleapis.com/css2?family=Jersey+25&family=Michroma&family=Press+Start+2P&family=Science+Gothic:wght@100..900&display=swap");
+
+@font-face {
+  font-family: "Doom";
+  src: url("font/DooM.ttf");
+}
+
+@font-face {
+  font-family: "AmazDoomL";
+  src: url("./font/AmazDooMLeft.ttf") format("truetype");
+  font-weight: normal;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: "AmazDoomR";
+  src: url("./font/AmazDooMRight.ttf") format("truetype");
+  font-weight: normal;
+  font-style: normal;
+}
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  user-select: none;
+  -webkit-tap-highlight-color: transparent;
+}
+
+html,
+body {
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+}
+
+body {
+  background: url("img/doom-background.png");
+  background-size: cover;
+  background-repeat: no-repeat;
+  background-position: center center;
+  border: 40px ridge transparent;
+  border-image: repeating-linear-gradient(
+      45deg,
+      #1a1a1ade 40px,
+      #202020e0 80px,
+      #121212ef 120px
+    )
+    30;
+
+  /* O TRUQUE DO DOOM: Sombras para dar profundidade de metal chanfrado */
+  box-shadow:
+    inset 0 0 20px rgba(0, 0, 0, 0.4),
+    inset 5px 5px 0px rgba(255, 255, 255, 0.1),
+    inset -5px -5px 0px rgba(0, 0, 0, 0.3);
+  position: relative;
+}
+
+body::after {
+  content: "";
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.4);
+  backdrop-filter: blur(5px);
+  z-index: -1;
+  position: absolute;
+}
+
+.damage-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  z-index: 1000;
+  opacity: 0;
+  transition: opacity 0.1s ease;
+}
+
+.damage-overlay.active {
+  opacity: 1;
+}
+
+.screen-blood {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: radial-gradient(
+    circle,
+    rgba(139, 0, 0, 0) 0%,
+    rgba(139, 0, 0, 0.3) 50%,
+    rgba(180, 0, 0, 0.6) 80%,
+    rgba(100, 0, 0, 0.8) 100%
+  );
+  mix-blend-mode: multiply;
+}
+
+.blood-splatter {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><circle cx="20" cy="30" r="3" fill="%238b0000" opacity="0.6"/><circle cx="75" cy="25" r="4" fill="%238b0000" opacity="0.5"/><circle cx="45" cy="80" r="5" fill="%238b0000" opacity="0.4"/><circle cx="85" cy="70" r="3" fill="%238b0000" opacity="0.7"/><circle cx="15" cy="85" r="4" fill="%238b0000" opacity="0.5"/><path d="M30 50 Q35 40 40 50 Q45 60 30 50" fill="%238b0000" opacity="0.4"/><path d="M60 20 Q65 10 70 20 Q75 30 60 20" fill="%238b0000" opacity="0.5"/></svg>');
+  background-repeat: repeat;
+  background-size: 100px 100px;
+  opacity: 0;
+  animation: bloodSplatter 0.5s ease-out forwards;
+}
+
+@keyframes bloodSplatter {
+  0% {
+    opacity: 0;
+    transform: scale(1);
+  }
+
+  20% {
+    opacity: 0.8;
+  }
+
+  100% {
+    opacity: 0;
+    transform: scale(1.2);
+  }
+}
+
+@keyframes shake {
+  0%,
+  100% {
+    transform: translate(0, 0);
+  }
+
+  10% {
+    transform: translate(-5px, -3px);
+  }
+
+  20% {
+    transform: translate(4px, 2px);
+  }
+
+  30% {
+    transform: translate(-3px, 4px);
+  }
+
+  40% {
+    transform: translate(2px, -2px);
+  }
+
+  50% {
+    transform: translate(-2px, 3px);
+  }
+
+  60% {
+    transform: translate(1px, -1px);
+  }
+
+  70% {
+    transform: translate(-1px, 2px);
+  }
+
+  80% {
+    transform: translate(0px, -1px);
+  }
+
+  90% {
+    transform: translate(1px, 0px);
+  }
+}
+
+.shake-active {
+  animation: shake 0.3s ease-in-out;
+}
+
+/* Efeito de pulso vermelho nas bordas */
+.red-pulse {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  z-index: 999;
+  box-shadow: inset 0 0 50px 20px rgba(255, 0, 0, 0);
+  animation: redPulse 0.5s ease-out forwards;
+}
+
+@keyframes redPulse {
+  0% {
+    box-shadow: inset 0 0 0 0 rgba(255, 0, 0, 0);
+  }
+
+  50% {
+    box-shadow: inset 0 0 100px 40px rgba(255, 0, 0, 0.6);
+  }
+
+  100% {
+    box-shadow: inset 0 0 0 0 rgba(255, 0, 0, 0);
+  }
+}
+
+@keyframes cameraShake {
+  0% {
+    transform: translate(0px, 0px);
+  }
+
+  25% {
+    transform: translate(-3px, 2px);
+  }
+
+  50% {
+    transform: translate(3px, -2px);
+  }
+
+  75% {
+    transform: translate(-2px, -1px);
+  }
+
+  100% {
+    transform: translate(2px, 1px);
+  }
+}
+
+.shake-camera {
+  animation: cameraShake 0.3s ease-in-out;
+}
+
+.container {
+  height: 100%;
+  position: relative;
+}
+
+.credits-container {
+  display: none;
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.35);
+  backdrop-filter: blur(3px);
+  align-items: center;
+  justify-content: center;
+  z-index: 2001;
+  overflow: hidden;
+  animation: creditsFadeIn 0.5s ease;
+}
+
+.credits-container .credits-content {
+  width: 65%;
+  max-width: 800px;
+  height: auto;
+  max-height: 85vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-start;
+  padding: 2em;
+  color: #ffcc44;
+  font-size: 1.1rem;
+  font-family: "Science Gothic", "Press Start 2P", monospace;
+  font-weight: 500;
+  line-height: 1.6;
+  text-align: justify;
+  background: repeating-linear-gradient(
+    135deg,
+    rgba(27, 27, 27, 0.95) 0px,
+    rgba(27, 27, 27, 0.9) 10px,
+    rgba(27, 27, 27, 0.95) 50px
+  );
+  border: 3px ridge #8b0000;
+  box-shadow:
+    0 0 30px rgba(139, 0, 0, 0.3),
+    inset 0 0 20px rgba(0, 0, 0, 0.5);
+  border-radius: 8px;
+  overflow-y: auto;
+  scrollbar-width: thin;
+  scrollbar-color: #8b0000 #2a0000;
+  transform: perspective(350px);
+}
+
+.credits-container .credits-content::-webkit-scrollbar {
+  width: 6px;
+}
+
+.credits-container .credits-content::-webkit-scrollbar-track {
+  background: #2a0000;
+  border-radius: 3px;
+}
+
+.credits-container .credits-content::-webkit-scrollbar-thumb {
+  background: #8b0000;
+  border-radius: 3px;
+}
+
+.credits-container .credits-content .credits-text {
+  position: relative;
+  width: 100%;
+  animation: creditsScroll 20s linear infinite;
+}
+
+.credits-container .credits-content h2 {
+  text-align: center;
+  font-size: 2.5rem;
+  margin-bottom: 20px;
+  text-transform: uppercase;
+  font-family: "Doom", "AmazDoomR", monospace;
+  letter-spacing: 4px;
+  color: #ff0000;
+  text-shadow:
+    0 0 10px #ff0000,
+    0 0 5px #8b0000;
+}
+
+.credits-container .credits-content h3 {
+  text-align: center;
+  font-size: 1.2rem;
+  margin-bottom: 30px;
+  color: #ffaa00;
+  text-transform: uppercase;
+  letter-spacing: 2px;
+}
+
+.credits-container .credits-content p {
+  margin: 15px 0;
+  text-shadow: 1px 1px 0 #000;
+}
+
+.credits-container .credits-content strong {
+  color: #ff6b6b;
+  font-weight: bold;
+  text-transform: uppercase;
+}
+
+.credits-container .credits-content ul {
+  margin: 10px 0 10px 30px;
+  list-style-type: none;
+}
+
+.credits-container .credits-content li {
+  margin: 8px 0;
+  position: relative;
+}
+
+.credits-container .credits-content li::before {
+  content: "►";
+  color: #ff0000;
+  position: absolute;
+  left: -20px;
+  font-size: 0.8rem;
+}
+
+.credits-container .credits-content em {
+  display: block;
+  text-align: center;
+  margin-top: 25px;
+  color: #ffaa00;
+  font-style: normal;
+  font-size: 0.8rem;
+  border-top: 1px solid #8b0000;
+  padding-top: 15px;
+}
+
+@keyframes creditsFadeIn {
+  from {
+    opacity: 0;
+    transform: scale(0.8);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+@keyframes creditsScroll {
+  from {
+    transform: translateY(100%);
+  }
+  to {
+    transform: translateY(-60%);
+  }
+}
+
+.doom-title {
+  display: flex;
+  width: 100%;
+  height: 300px;
+  justify-content: center;
+  margin-bottom: 8px;
+
+  img {
+    width: 300px;
+    height: 300px;
+    animation: titleAnim 4s ease-in-out infinite;
+  }
+}
+
+@keyframes titleAnim {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+
+  50% {
+    transform: translateY(15px);
+  }
+}
+
+.tutorial-container {
+  position: absolute;
+  top: 0;
+  left: 0;
+  color: white;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.45);
+  backdrop-filter: blur(5px);
+  justify-content: center;
+  align-items: center;
+  display: none;
+  z-index: 2000;
+  padding: 20px;
+  box-sizing: border-box;
+
+  .tutorial-box {
+    display: flex;
+    flex-direction: column;
+    gap: 25px;
+    width: 50%;
+    align-items: center;
+    justify-content: center;
+
+    .tutorial-card {
+      background: repeating-linear-gradient(
+        135deg,
+        #192717be 0px,
+        #1927175b 2px,
+        #192717 5px
+      );
+      box-shadow: 3px 3px 15px rgba(0, 0, 0, 0.6);
+      box-sizing: border-box;
+      border-radius: 6px;
+      border: 5px solid #424242;
+      overflow: visible;
+      font-family: "Arial", sans-serif;
+      position: relative;
+      display: none;
+      flex-direction: column;
+
+      &.movimentacao {
+        width: 600px;
+        height: 255px;
+      }
+
+      &.mecanicas {
+        width: 460px;
+        height: 365px;
+      }
+
+      &.armas {
+        width: 520px;
+        min-height: 440px;
+      }
+
+      &.hud {
+        width: 520px;
+        height: 440px;
+      }
+
+      &.inimigos {
+        width: 520px;
+        height: 260px;
+      }
+
+      &.objetivos {
+        width: 520px;
+        height: 260px;
+      }
+
+      &.rows-expanded {
+        min-height: 280px;
+      }
+
+      &.fases-exploracao {
+        width: 520px;
+        min-height: 180px;
+      }
+
+      .tutorial-id {
+        background-color: #3b473e;
+        display: flex;
+        width: 36px;
+        height: 36px;
+        align-items: center;
+        justify-content: center;
+        position: absolute;
+        top: 0;
+        left: 0;
+        transform: translate(-35%, -35%);
+        border-radius: 4px;
+        font-size: 1.1em;
+        font-weight: bold;
+        border: 2px solid #192717;
+        box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.5);
+        font-family: "Press Start 2P", monospace;
+        color: #fff;
+        z-index: 10;
+      }
+
+      .tutorial-title {
+        background-color: #22371e;
+        image-rendering: pixelated;
+        display: flex;
+        align-items: center;
+        border-bottom: 3px solid #0b120a;
+        box-shadow: 0px 3px 5px rgba(0, 0, 0, 0.4);
+        padding: 10px 15px 10px 25px;
+
+        h2 {
+          margin: 0;
+          font-size: 1.05em;
+          font-weight: 900;
+          text-transform: uppercase;
+          text-shadow: 2px 2px 0px #000;
+          letter-spacing: 1px;
+          color: #e2e2e2;
+        }
+      }
+
+      .tutorial-content {
+        display: flex;
+        padding: 15px;
+        box-sizing: border-box;
+        width: 100%;
+        flex: 1;
+        gap: 15px;
+
+        p {
+          margin: 0;
+          line-height: 1.4;
+          font-size: 0.85em;
+          text-shadow: 1px 1px 2px #000;
+          font-family: "Arial";
+
+          strong {
+            color: #ffcc00;
+          }
+        }
+
+        &.splits-layout {
+          justify-content: space-between;
+          align-items: center;
+        }
+
+        .movement-visual {
+          position: relative;
+          padding: 10px;
+        }
+
+        .arrow-container {
+          display: flex;
+          align-items: center;
+          flex-direction: column;
+          gap: 6px;
+
+          span {
+            display: flex;
+            flex-direction: row;
+            gap: 6px;
+          }
+
+          .arrow {
+            background-color: #333;
+            border: 2px outset #555;
+            border-radius: 4px;
+            width: 44px;
+            height: 44px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+
+            p {
+              margin: 0;
+              font-family: "Press Start 2P", monospace;
+              font-size: 0.8em;
+              font-weight: bold;
+              color: #fff;
+              background-color: rgba(0, 0, 0, 0.1);
+              width: 40px;
+              height: 40px;
+              border-radius: 4px;
+              display: flex;
+              align-items: center;
+              justify-content: center;
+              border: 4px outset #000;
+            }
+
+            .direction-arrow {
+              position: absolute;
+              color: #2979ff;
+              font-size: 1.2em;
+              text-shadow: 0 0 4px rgba(0, 0, 0, 0.8);
+
+              &.up {
+                bottom: 110%;
+                left: 15%;
+              }
+
+              &.down {
+                top: 110%;
+                left: 15%;
+              }
+
+              &.left {
+                right: 100%;
+                top: 25%;
+              }
+
+              &.right {
+                left: 100%;
+                top: 25%;
+              }
+            }
+          }
+        }
+
+        .arrow-info {
+          display: flex;
+          flex-direction: column;
+          gap: 6px;
+          flex: 1;
+          padding-left: 1em;
+
+          .highlight-note {
+            font-family: "Press Start 2P", monospace;
+            font-size: 0.65em;
+            color: #ff3d00;
+            margin-top: 5px;
+            text-shadow: 1px 1px 0 #000;
+          }
+        }
+
+        &.guns-layout {
+          flex-direction: column;
+          justify-content: space-between;
+
+          .gun-list {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+
+            li {
+              display: flex;
+              align-items: center;
+              gap: 12px;
+              background: rgba(0, 0, 0, 0.5);
+              padding: 6px;
+              border-radius: 4px;
+              border-left: 3px solid #ffcc00;
+
+              .weapon-key {
+                font-family: "Press Start 2P", monospace;
+                background: #424242;
+                padding: 4px 8px;
+                font-size: 0.7em;
+                border-radius: 2px;
+                color: #ffcc00;
+              }
+
+              .weapon-details {
+                display: flex;
+                flex-direction: column;
+
+                .weapon-name {
+                  font-weight: bold;
+                  font-size: 0.9em;
+                }
+
+                .weapon-stats {
+                  font-size: 0.75em;
+                  color: #a0a0a0;
+                }
+              }
+            }
+          }
+        }
+
+        &.combat-layout {
+          flex-direction: column;
+          gap: 12px;
+        }
+
+        &.objective-layout {
+          flex-direction: column;
+          gap: 15px;
+        }
+
+        .objective-text {
+          display: flex;
+          flex-direction: column;
+          gap: 12px;
+        }
+
+        .damage-system-box {
+          background-color: #0b1a0b;
+          border: 3px dashed #00ff00;
+          padding: 12px;
+          border-radius: 4px;
+          box-shadow: 0 0 10px rgba(0, 255, 0, 0.2);
+
+          h3 {
+            font-family: "Impact", sans-serif;
+            letter-spacing: 2px;
+            font-size: 0.9em;
+            text-shadow: 1px 1px 2px #000;
+            margin: 0 0 8px 0;
+            color: #019201;
+          }
+
+          p {
+            margin: 0;
+            font-size: 0.8em;
+          }
+
+          strong {
+            color: #00ff00;
+            text-shadow: 0 0 5px rgba(0, 255, 0, 0.5);
+          }
+        }
+
+        &.mechanics-layout {
+          flex-direction: column;
+          gap: 12px;
+          justify-content: center;
+
+          .mechanic-row {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            background: rgba(0, 0, 0, 0.5);
+            padding: 8px;
+            border-radius: 4px;
+
+            .mechanic-icon {
+              width: 36px;
+              height: 36px;
+              background: #333;
+              border: 2px outset #555;
+              display: flex;
+              align-items: center;
+              justify-content: center;
+              font-size: 1.1em;
+              color: #ffcc00;
+              border-radius: 4px;
+              flex-shrink: 0;
+
+              i {
+                display: inline-block;
+                margin: 4px;
+              }
+
+              &.score-badge {
+                font-family: "Press Start 2P", monospace;
+                font-size: 0.65em;
+                color: #ff3d00;
+              }
+            }
+          }
+        }
+
+        &.hud-layout {
+          display: flex;
+          justify-content: space-between;
+          align-items: center;
+          gap: 8px;
+
+          .hud-explanation {
+            display: flex;
+            flex-direction: column;
+            gap: 14px;
+            width: 28%;
+
+            .info-block {
+              font-size: 0.65em;
+              background: rgba(0, 0, 0, 0.3);
+              padding: 4px;
+              border-radius: 3px;
+              border-bottom: 1px solid #444;
+
+              p {
+                font-size: 1em;
+                line-height: 1.2;
+              }
+            }
+          }
+
+          .hud-mockup {
+            background: #000;
+            border: 3px double #555;
+            padding: 6px;
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+            width: 40%;
+            box-sizing: border-box;
+
+            .hud-row-top {
+              display: flex;
+              justify-content: space-between;
+              align-items: center;
+              border-bottom: 1px solid #222;
+              padding-bottom: 4px;
+            }
+
+            .hud-stat {
+              font-family: "Press Start 2P", monospace;
+              font-size: 0.55em;
+              display: flex;
+              flex-direction: column;
+              align-items: center;
+
+              span {
+                font-size: 0.6em;
+                color: #888;
+                margin-top: 2px;
+              }
+
+              &.highlight-red {
+                color: #ff3d00;
+              }
+
+              &.highlight-yellow {
+                color: #ffcc00;
+              }
+            }
+
+            .hud-face {
+              font-size: 0.9em;
+              color: #d7ccc8;
+            }
+
+            .hud-row-bottom {
+              display: flex;
+              justify-content: space-between;
+              align-items: center;
+            }
+
+            .hud-weapon-view {
+              color: #757575;
+              font-size: 0.9em;
+            }
+
+            .hud-ammo-bar {
+              display: flex;
+              gap: 2px;
+
+              span {
+                width: 6px;
+                height: 10px;
+                background: #00e676;
+                display: inline-block;
+              }
+            }
+          }
+        }
+
+        .content-footer {
+          width: 100%;
+          background: #2a3a28;
+          border: 1px dashed #4e6b4a;
+          padding: 6px;
+          text-align: center;
+          margin-top: auto;
+          box-sizing: border-box;
+
+          p {
+            font-family: "Press Start 2P", monospace;
+            font-size: 0.62em;
+            color: #ffcc00;
+            margin: 0;
+          }
+
+          &.wide-footer {
+            width: 100%;
+            background: #331414;
+            border-color: #611c1c;
+
+            p {
+              color: #ff8a80;
+            }
+          }
+        }
+      }
+    }
+
+    .tutorial-buttons-actions {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      width: 100%;
+      padding: 20px 32px;
+      box-sizing: border-box;
+
+      .btn-tutorial-action {
+        padding: 12px 28px;
+        color: rgb(156, 0, 0);
+        font-size: 1em;
+        font-weight: 800;
+        text-transform: uppercase;
+        border-radius: 4px;
+        font-family: "Science Gothic";
+        user-select: none;
+        transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+        background-color: #1b1814;
+        border: 5px ridge #2b2824;
+        text-shadow: 1px 1px 8px rgba(0, 0, 0, 0.5);
+
+        &:hover {
+          transform: translateY(-2px);
+        }
+
+        &:active {
+          transform: translateY(1px);
+        }
+      }
+    }
+  }
+}
+
+.disable {
+  opacity: 0.4;
+
+  &:hover {
+    cursor: not-allowed;
+    transform: translateY(0) !important;
+  }
+}
+
+.intro-character-container {
+  display: none;
+  width: 100%;
+  height: 100%;
+  position: absolute;
+  top: 0;
+  left: 0;
+  justify-content: center;
+  align-items: center;
+  flex-direction: column;
+  background-color: rgba(0, 0, 0, 0.6);
+  backdrop-filter: blur(8px);
+  z-index: 1000;
+  transition: all 0.3s ease;
+  margin: 0;
+
+  .character-content {
+    width: 650px;
+    height: 380px;
+    /* Um pouco mais alto para dar respiro ao texto */
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+    gap: 15px;
+    padding: 25px 15px 15px 15px;
+
+    /* TEXTURA DO PAINEL PRINCIPAL: Metal escovado simulando chapa pesada */
+    background: repeating-linear-gradient(
+      45deg,
+      #1b1b1b 0px,
+      transparent 1px,
+      #1b1b1bf6 5px
+    );
+
+    /* BORDA RETRÔ: Simula o chanfrado de metal 3D dos anos 90 (Estilo Bevel) */
+    border: 8px groove #3a3a3a;
+    position: relative;
+
+    .character-image-container {
+      height: 100%;
+      width: 220px;
+      display: flex;
+      justify-content: center;
+      align-items: flex-end;
+      /* Coloca o Doomguy pisando no chão da caixinha */
+      overflow: hidden;
+      border: 3px ridge #1a1a1a;
+
+      /* O GRADIENTE DO NICHO: Escuro -> Claro -> Escuro (Simula curvatura de metal iluminado) */
+      background: repeating-radial-gradient(
+        ellipse at center,
+
+        #1b1b1b 0%,
+        #201a12 20%,
+        #1b1b1b 50%,
+        #1b160f 80%,
+        #1b1b1b 100%
+      );
+
+      /* Sombra interna pesada para dar o efeito de "recorte/buraco" na parede */
+      box-shadow:
+        inset 10px 0px 15px rgba(0, 0, 0, 0.85),
+        inset -10px 0px 15px rgba(0, 0, 0, 0.85),
+        inset 0px 12px 10px rgba(0, 0, 0, 0.9);
+
+      img {
+        height: 95%;
+        object-fit: contain;
+        /* Não distorce e mantém a proporção do corpo inteiro */
+
+        /* O SEGREDO DO RETRÔ: Impede que o navegador embace os pixels do Doomguy */
+        image-rendering: pixelated;
+        image-rendering: crisp-edges;
+        filter: drop-shadow(5px 5px 0px rgba(0, 0, 0, 0.7));
+        /* Sombra projetada do boneco na parede */
+      }
+    }
+
+    .character-container-text {
+      display: flex;
+      flex-direction: column;
+      width: 360px;
+      height: 100%;
+
+      > p {
+        color: #fff;
+        font-weight: 700;
+        letter-spacing: 1.1;
+        text-align: center;
+        margin-top: 10px;
+      }
+
+      .character-content-text {
+        background-color: #000000;
+        display: flex;
+        flex-direction: column;
+        justify-content: flex-start;
+        gap: 12px;
+        padding: 15px;
+        height: 100%;
+        width: 100%;
+        box-sizing: border-box;
+
+        /* Borda interna escura para a caixa de texto */
+        border: 2px solid #1a1a1a;
+        box-shadow: inset 0px 0px 10px rgba(0, 0, 0, 0.8);
+        font-size: 0.9em;
+        line-height: 1.4;
+        letter-spacing: 1.1;
+        font-family: "Jersey 25", monospace;
+
+        span {
+          color: #ff0000;
+          font-weight: bold;
+          text-shadow: 1px 1px 0px #000;
+        }
+
+        p {
+          color: #df9b00;
+          font-weight: 400;
+          margin: 0;
+          text-shadow: 1px 1px 0px #000;
+          text-align: start;
+        }
+      }
+    }
+  }
+}
+
+.game-container {
+  width: 100%;
+  height: 100%;
+  border: 1px solid #1e2430;
+  box-shadow: 1px 1px 4px #9e9e9e85;
+  padding: 2rem;
+  display: none;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.game-container::after {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: repeating-linear-gradient(
+    0deg,
+    rgba(0, 0, 0, 0.1) 0px,
+    rgba(0, 0, 0, 0.1) 2px,
+    transparent 2px,
+    transparent 4px
+  );
+  pointer-events: none;
+  border-radius: 24px;
+}
+
+.menu-inicial {
+  position: relative;
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.menu-actions {
+  display: flex;
+  flex-direction: column;
+  border-radius: 4px;
+  width: 420px;
+}
+
+.btn-action-container {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  width: 100%;
+}
+
+.menu-row {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  position: relative;
+}
+
+.arrow-slot {
+  color: #dc0000;
+  width: 35px;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.5em;
+  text-shadow: 2px 2px 3px #000;
+  position: absolute;
+  left: 0;
+}
+
+.btn-action {
+  color: #bbbbbb;
+  background: linear-gradient(180deg, #2a2a2a 0%, #151515 100%);
+  border: 6px ridge #4e4e4e;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.5);
+  border-radius: 6px;
+  padding: 12px 0;
+  width: 80%;
+  text-align: center;
+  font-family: "Impact", "Arial Black", sans-serif;
+  font-size: 1.3em;
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+  text-shadow: 2px 2px 2px #000;
+  cursor: pointer;
+  transition: all 0.1s ease;
+}
+
+.btn-action:hover {
+  border-color: #6e6e6e;
+}
+
+.btn-active {
+  border: 6px ridge #ff00009c;
+  border-radius: 6px;
+  background: linear-gradient(180deg, #2a0a0a 0%, #0a0000 100%);
+  color: #ffffff;
+  padding: 12px 32px;
+  transition: all 0.3s ease;
+  cursor: pointer;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.5);
+  transform: scale(1.01);
+
+  &:hover {
+    border-color: #ff0000;
+  }
+}
+
+.doom-panel {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  border-radius: 0 0 1em 1em;
+}
+
+.info-bar {
+  display: grid;
+  grid-template-columns: repeat(5, auto);
+  height: 170px;
+  background: repeating-linear-gradient(180deg, #1b1b1b9f 0px, #1b1b1b9f 50px);
+}
+
+.stat {
+  border-left: 8px groove #1b1b1b9f;
+  border-top: 8px groove #1b1b1b9f;
+  border-bottom: 8px groove #1b1b1b9f;
+  background-color: rgba(0, 0, 0, 0.1);
+  backdrop-filter: blur(5px);
+}
+
+.stat-title {
+  font-family: "Press Start 2P";
+  font-size: 0.6em;
+  font-weight: 600;
+  color: #969696;
+  letter-spacing: 5px;
+  text-transform: uppercase;
+  text-shadow: 1px 1px 4px #000;
+  text-align: center;
+  line-height: 1.1em;
+  margin-top: 6px;
+}
+
+.stat-text {
+  font-family: "Press Start 2P";
+  font-size: 1.4em;
+  font-weight: 600;
+}
+
+.vida-container {
+  color: #fff;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: space-evenly;
+  gap: 10px;
+}
+
+.vida-content {
+  width: 100%;
+  padding: 0 1.3em;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+
+  span {
+    color: #ff0000;
+    font-size: 1.5em;
+    font-weight: 700;
+    text-shadow: 1px 1px 4px #000;
+  }
+}
+
+.barra-vida-container {
+  width: 100%;
+  height: 15px;
+  border: 3px solid #000;
+  margin: 4px 0;
+  background-color: transparent;
+  overflow: hidden;
+
+  .barra-vida {
+    height: 100%;
+    width: 100%;
+    background-image: repeating-linear-gradient(
+      135deg,
+      #255122 1px,
+      transparent 10px,
+      #255122 10px
+    );
+    background-size: 12px 100%;
+    animation: moveStripes 0.6s linear infinite;
+  }
+}
+
+@keyframes moveStripes {
+  0% {
+    background-position: 0 0;
+  }
+
+  100% {
+    background-position: -12px 0;
+  }
+}
+
+.municao-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: space-evenly;
+
+  ul.municao-content {
+    display: flex;
+    flex-direction: column;
+    padding: 0 1em;
+    width: 100%;
+
+    li.municao-item {
+      color: #ccc;
+      display: flex;
+      width: 100%;
+      justify-content: space-between;
+      font-size: 0.8em;
+      font-family: "Science Gothic";
+      font-weight: 700;
+    }
+  }
+}
+
+.gun-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: space-evenly;
+  color: #a0a7b6;
+
+  .gun-content {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-around;
+    gap: 10px;
+    box-sizing: border-box;
+
+    .gun-selected {
+      display: flex;
+      border: 3px groove #000;
+      font-size: 0.8em;
+      background-color: #0b0e14;
+      width: 40px;
+      height: 40px;
+      justify-content: center;
+      align-items: center;
+    }
+
+    .gun-selected-active {
+      display: flex;
+      border: 1px solid #fff;
+      font-size: 0.8em;
+      background-color: #5b5949;
+      color: #fff;
+      width: 40px;
+      height: 40px;
+      justify-content: center;
+      align-items: center;
+    }
+  }
+
+  .gun-description {
+    font-size: 0.6em;
+    font-weight: 400;
+    font-family: "Science Gothic";
+    text-align: center;
+    letter-spacing: 1.1px;
+    margin: 4px 1em;
+    width: 80%;
+  }
+}
+
+.divider {
+  width: 80%;
+  height: 1px;
+  background-color: #3a3a3a;
+  box-shadow: 1px 1px 8px #000;
+}
+
+.inimigos-rest-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: space-evenly;
+  gap: 10px;
+
+  span {
+    color: #ff0000;
+    text-shadow: 1px 1px 4px #000;
+    font-size: 1.4em;
+  }
+}
+
+.icon {
+  color: #f68836;
+}
+
+.controls-tip {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-around;
+  align-items: center;
+  border-right: 4px groove #272626;
+
+  .controls-content {
+    display: flex;
+    align-items: center;
+    justify-content: space-around;
+    color: #fff;
+    width: 100%;
+  }
+
+  .controls-move {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+
+    span {
+      display: flex;
+      flex-direction: row;
+      gap: 2px;
+    }
+
+    .key {
+      background-color: #0b0e14;
+      border-radius: 4px;
+      border: 4px outset #000;
+      font-family: "Press Start 2P";
+      font-size: 0.7em;
+      width: 40px;
+      height: 40px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+  }
+}
+
+.doomInterface {
+  flex: 1;
+
+  display: flex;
+  overflow: hidden;
+
+  background: #000;
+}
+
+.game-area {
+  width: 77%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1rem;
+  background: linear-gradient(360deg, #cc0d0dbe, #5c0506bd, #461803b4);
+  /* background: radial-gradient(circle at center, #8b0000, #2a0000); */
+  overflow: hidden;
+  position: relative;
+}
+
+/* ========== NOVO OBJETIVO VISUAL ESTILO DOOM ========== */
+.objetivo-text {
+  position: absolute;
+  top: 20px;
+  right: 150px;
+  width: 380px;
+  z-index: 100;
+
+  /* Painel metálico retrô */
+  background: linear-gradient(135deg, #0a0806 0%, #14100c 100%);
+  border: 3px solid #8b0000;
+  border-radius: 0px;
+  box-shadow:
+    inset 0 0 15px rgba(0, 0, 0, 0.8),
+    0 8px 20px rgba(0, 0, 0, 0.5),
+    0 0 0 2px #3a2a1a,
+    0 0 0 5px #1a120a;
+
+  /* Cantos chanfrados estilo Doom */
+  clip-path: polygon(0% 0%, 100% 0%, 100% 100%, 0% 100%);
+
+  padding: 0;
+  overflow: hidden;
+  transition: all 0.2s ease;
+}
+
+/* Faixa superior vermelha */
+.objetivo-text::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 6px;
+  background: linear-gradient(90deg, #ff0000, #8b0000, #ff0000);
+  z-index: 1;
+}
+
+/* Container interno do texto */
+.objetivo-text .objective-inner {
+  padding: 18px 20px 16px 24px;
+  position: relative;
+}
+
+/* Texto principal (parágrafo) */
+.objetivo-text p {
+  margin: 0;
+  font-family: "Jersey 25", "Science Gothic", monospace;
+  font-size: 1rem;
+  line-height: 1.5;
+  color: #f5e6d3;
+  text-shadow: 2px 2px 0px #3a0000;
+  letter-spacing: 0.5px;
+  word-break: break-word;
+  position: relative;
+  z-index: 2;
+}
+
+/* Destaque para palavras importantes (Keycard, Barão, etc) */
+.objetivo-text p strong,
+.objetivo-text p span.highlight {
+  color: #ff4444;
+  text-shadow:
+    0 0 6px #ff0000,
+    1px 1px 0px #2a0000;
+  font-weight: bold;
+  display: inline-block;
+  animation: objetivoPulse 1.2s ease-in-out infinite;
+}
+
+/* Efeito de scanline na borda */
+.objetivo-text .scan-effect {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: repeating-linear-gradient(
+    0deg,
+    rgba(0, 0, 0, 0.15) 0px,
+    rgba(0, 0, 0, 0.15) 2px,
+    transparent 2px,
+    transparent 6px
+  );
+  pointer-events: none;
+  z-index: 3;
+}
+
+/* Animação de pulsar nos destaques */
+@keyframes objetivoPulse {
+  0%,
+  100% {
+    text-shadow:
+      0 0 2px #ff0000,
+      1px 1px 0px #2a0000;
+    color: #ff5555;
+  }
+
+  50% {
+    text-shadow:
+      0 0 10px #ff0000,
+      0 0 5px #ff6600;
+    color: #ff8888;
+  }
+}
+
+/* Resposta responsiva */
+@media (max-width: 900px) {
+  .objetivo-text {
+    top: 10px;
+    right: 10px;
+    max-width: 280px;
+  }
+
+  .objetivo-text p {
+    font-size: 0.65rem;
+    padding-left: 28px;
+  }
+
+  .objetivo-text .objective-icon {
+    font-size: 22px;
+    left: 8px;
+  }
+
+  .objetivo-text .objective-inner {
+    padding: 12px 14px 10px 18px;
+  }
+}
+
+.doom-face-player {
+  width: 200px;
+  height: 200px;
+  display: none;
+  position: relative;
+  border: 3px solid #2a2e32;
+  margin: 10px;
+  align-self: flex-end;
+  margin-left: auto;
+  overflow: hidden;
+
+  img {
+    width: 200px;
+    height: 200px;
+    object-fit: cover;
+    object-position: center;
+  }
+}
+
+.canvas-wrapper {
+  width: 50%;
+  height: 100%;
+  display: none;
+  align-items: center;
+  justify-content: center;
+}
+
+#doomCanvas {
+  display: block;
+
+  max-width: 100%;
+  max-height: 100%;
+
+  width: auto;
+  height: auto;
+
+  object-fit: contain;
+
+  background: #000;
+
+  image-rendering: pixelated;
+
+  box-shadow:
+    0 0 0 4px #2a1e12,
+    0 0 0 8px #1a120a;
+}
+
+/* ================= CONSOLE ESTILO DOOM ================= */
+
+.console-panel {
+  display: flex;
+  flex-direction: column;
+  background: #0a0c0e;
+  border-left: 4px solid #8b0000;
+  overflow: hidden;
+  max-height: 100%;
+  width: 30%;
+  box-shadow: inset 0 0 20px rgba(0, 0, 0, 0.5);
+}
+
+/* Área do console - TELA DE LOGS */
+.console-area {
+  flex: 1;
+  overflow-y: auto;
+  padding: 12px 8px;
+  background: #030507;
+  color: #2ecc2e;
+  font-family: "Courier New", "Press Start 2P", monospace;
+  font-size: 0.7rem;
+  line-height: 1.6;
+  text-shadow: 0 0 3px #00aa00;
+  word-break: break-word;
+  border-bottom: 2px solid #8b0000;
+  display: none;
+}
+
+.console-area::-webkit-scrollbar {
+  width: 0;
+}
+
+.console-area::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.console-area::-webkit-scrollbar-thumb {
+  background: transparent;
+}
+
+.console-area::-webkit-scrollbar-thumb:hover {
+  background: transparent;
+}
+
+.console-area div {
+  margin-bottom: 6px;
+  padding: 4px 6px;
+  border-left: 3px solid #8b0000;
+  background: rgba(0, 0, 0, 0.4);
+  font-family: "Courier New", "Science Gothic", monospace;
+  font-size: 0.7rem;
+  letter-spacing: 0.5px;
+  animation: consoleFadeIn 0.2s ease-out;
+}
+
+.console-area div::before {
+  content: ">";
+  color: #ff4444;
+  font-weight: bold;
+  margin-right: 8px;
+  font-family: monospace;
+  font-size: 0.75rem;
+}
+
+.console-area div[data-type="victory"],
+.console-area div:contains("GRANDE VITORIA"),
+.console-area div:contains("VENCEU") {
+  border-left-color: #00ff00;
+  color: #00ff00;
+  text-shadow: 0 0 5px #00aa00;
+  background: rgba(0, 255, 0, 0.1);
+}
+
+.console-area div:contains("GAME OVER"),
+.console-area div:contains("morreu"),
+.console-area div:contains("Perdeu") {
+  border-left-color: #ff0000;
+  color: #ff4444;
+  text-shadow: 0 0 5px #ff0000;
+  background: rgba(255, 0, 0, 0.1);
+}
+
+.console-area div:contains("pegou"),
+.console-area div:contains("Munição") {
+  border-left-color: #ffaa00;
+  color: #ffcc44;
+  text-shadow: 0 0 3px #ffaa00;
+}
+
+.console-area div:contains("SAÍDA"),
+.console-area div:contains("saída") {
+  border-left-color: #00ccff;
+  color: #44ddff;
+  text-shadow: 0 0 3px #00aaff;
+}
+
+.console-area div:contains("Monstro morto"),
+.console-area div:contains("inimigo") {
+  border-left-color: #ff6600;
+  color: #ff8844;
+}
+
+@keyframes consoleFadeIn {
+  0% {
+    opacity: 0;
+    transform: translateX(-10px);
+  }
+
+  100% {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+.console-area::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  background: repeating-linear-gradient(
+    0deg,
+    rgba(0, 0, 0, 0.15) 0px,
+    rgba(0, 0, 0, 0.15) 2px,
+    transparent 2px,
+    transparent 4px
+  );
+}
+
+.weapon-art {
+  display: none;
+  width: 90%;
+  max-height: 180px;
+  margin: 12px auto;
+  object-fit: cover;
+  border: 4px groove #1b1b1b81;
+  border-radius: 8px;
+  background: rgba(0, 0, 0, 0.7);
+  box-shadow: 1px 1px 8px rgba(53, 0, 0, 0.4);
+}
+
+.ammo-bar-container {
+  display: none;
+  background: #1a1a1a;
+  padding: 8px;
+  border-radius: 4px;
+  border: 4px groove #1b1b1b81;
+  margin: 10px;
+  text-align: center;
+  flex-direction: row;
+  align-items: center;
+  gap: 20px;
+}
+
+.ammo-label {
+  font-size: 12px;
+  color: #ccc;
+  margin-bottom: 4px;
+}
+
+.bar-fill-container {
+  width: 100%;
+  background-color: #333;
+  height: 12px;
+  border-radius: 2px;
+  overflow: hidden;
+}
+
+.bar-fill {
+  width: 100%;
+  height: 100%;
+  background: repeating-linear-gradient(
+    45deg,
+    #0f0 0px,
+    transparent 0px,
+    #0f0 10px
+  );
+  transition: width 0.1s;
+  animation: moveStripes 0.6s linear infinite;
+}
+
+#ammoLabel {
+  text-shadow: 1px 1px 0 #000;
+}
+
+button:active {
+  transform: translateY(2px);
+}
+
+@keyframes explode {
+  0% {
+    transform: scale(0);
+    opacity: 1;
+  }
+
+  100% {
+    transform: scale(2);
+    opacity: 0;
+  }
+}
+
+.explosion-effect {
+  position: absolute;
+
+  width: 60px;
+  height: 60px;
+
+  border-radius: 50%;
+
+  background: radial-gradient(circle, #ff6600, #ff3300, #ff0000);
+
+  pointer-events: none;
+
+  animation: explode 0.5s ease-out forwards;
+
+  z-index: 999;
+}
+
+@media (max-width: 900px) {
+  .doomInterface {
+    flex-direction: column;
+  }
+
+  .console-panel {
+    min-width: unset;
+    height: 40%;
+  }
+
+  .game-area {
+    height: 60%;
+  }
+
+  .info-bar {
+    justify-content: center;
+  }
+
+  .console-area {
+    font-size: 0.72rem;
+  }
+}
+
+.gameover-screen {
+  display: none;
+  justify-content: center;
+  align-items: center;
+  flex-direction: column;
+  pointer-events: auto;
+  width: 100%;
+  height: 100%;
+  position: absolute;
+  top: 0;
+  left: 0;
+  z-index: 2000;
+  animation: overDoom 0.7s ease;
+  image-rendering: pixelated;
+  color: white;
+}
+
+.gameover-screen.show {
+  display: flex;
+}
+
+.gameover-screen::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: radial-gradient(ellipse at center, #2a000041 0%, #0a000093 100%);
+  z-index: -2;
+}
+
+.gameover-screen::after {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><path d="M10 10 L20 10 L15 20 Z" fill="%238b0000" opacity="0.1"/><path d="M50 30 L60 30 L55 40 Z" fill="%238b0000" opacity="0.15"/><path d="M80 60 L90 60 L85 70 Z" fill="%238b0000" opacity="0.1"/><circle cx="30" cy="70" r="4" fill="%238b0000" opacity="0.08"/><circle cx="70" cy="20" r="3" fill="%238b0000" opacity="0.12"/><circle cx="15" cy="85" r="5" fill="%238b0000" opacity="0.06"/></svg>');
+  background-repeat: repeat;
+  background-size: 80px 80px;
+  opacity: 0.1;
+  z-index: -1;
+  pointer-events: none;
+}
+
+.gameover-container {
+  min-width: 650px;
+  height: auto;
+  min-height: 450px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 30px 20px;
+  gap: 25px;
+  background: repeating-linear-gradient(
+    135deg,
+    rgba(0, 0, 0, 0.7) 0px,
+    rgba(20, 10, 10, 0.7) 2px,
+    rgba(0, 0, 0, 0.7) 4px
+  );
+  border: 3px solid #8b0000;
+  box-shadow:
+    0 0 30px rgba(139, 0, 0, 0.5),
+    inset 0 0 20px rgba(139, 0, 0, 0.3);
+  backdrop-filter: blur(8px);
+  border-radius: 8px;
+}
+
+.gameover-title-container {
+  height: auto;
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin-bottom: 10px;
+}
+
+.gameover-title {
+  font-size: 4rem;
+  letter-spacing: 8px;
+  text-align: center;
+  font-family: "Jersey 25", "Doom", monospace;
+  text-transform: uppercase;
+  font-weight: 900;
+  filter: drop-shadow(5px 5px 0px #000000);
+  margin: 0;
+}
+
+.gameover-content {
+  background: repeating-linear-gradient(135deg, #1b1b1b81 0px, #1b1b1bab 50px);
+  border: 5px ridge #8b0000;
+  border-radius: 8px;
+  height: auto;
+  min-height: 180px;
+  width: 380px;
+  display: flex;
+  font-family: "Jersey 25", monospace;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 15px;
+  padding: 20px;
+  box-shadow:
+    inset 0 0 15px rgba(0, 0, 0, 0.5),
+    0 5px 15px rgba(0, 0, 0, 0.3);
+}
+
+.gameover-row {
+  display: flex;
+  flex-direction: row;
+  width: 100%;
+  justify-content: space-between;
+  align-items: center;
+  border-bottom: 1px solid rgba(139, 0, 0, 0.3);
+  padding-bottom: 8px;
+}
+
+.gameover-row:last-child {
+  border-bottom: none;
+}
+
+.gameover-row h5 {
+  color: #ff4444;
+  font-size: 1.5rem;
+  font-weight: 400;
+  text-shadow: 1px 1px 4px rgba(0, 0, 0, 0.8);
+  margin: 0;
+  letter-spacing: 1px;
+}
+
+.gameover-row span {
+  color: #ffaa00;
+  font-size: 1.8rem;
+  font-weight: 700;
+  text-shadow: 0 0 5px rgba(255, 170, 0, 0.5);
+  font-family: monospace;
+  margin: 0;
+}
+
+.gameover-btn-container {
+  display: flex;
+  width: 100%;
+  justify-content: space-evenly;
+  align-items: center;
+
+  .gameover-btn {
+    border: 3px solid #8b0000;
+    border-radius: 4px;
+    background: linear-gradient(180deg, #2a0a0a 0%, #0a0000 100%);
+    color: #cdcdcd;
+    /* Branco acinzentado por padrão */
+    padding: 12px 32px;
+    transition: all 0.3s ease;
+    cursor: pointer;
+    margin-top: 10px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.5);
+
+    &:hover {
+      transform: scale(1.05);
+      box-shadow: 0 0 15px rgba(139, 0, 0, 0.8);
+      border-color: #ff0000;
+    }
+
+    span {
+      font-size: 1.3rem;
+      font-family: "Science Gothic", monospace;
+      font-weight: bold;
+      background: linear-gradient(180deg, #ff3333 0%, #cc0000 100%);
+      -webkit-background-clip: text;
+      background-clip: text;
+      -webkit-text-fill-color: transparent;
+      filter: drop-shadow(1px 1px 0px #000000);
+      letter-spacing: 2px;
+    }
+  }
+}
+
+.menu-pause {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.8);
+  display: none;
+  z-index: 2000;
+  backdrop-filter: blur(3px);
+  animation: pauseDown 0.5s ease;
+
+  .pause-content {
+    margin: auto;
+    background: repeating-linear-gradient(
+      135deg,
+      rgba(0, 0, 0, 0.7) 0px,
+      rgba(20, 10, 10, 0.7) 2px,
+      rgba(0, 0, 0, 0.7) 4px
+    );
+    border: 3px solid #8b0000;
+    box-shadow:
+      0 0 30px rgba(139, 0, 0, 0.5),
+      inset 0 0 20px rgba(139, 0, 0, 0.3);
+    backdrop-filter: blur(8px);
+    border-radius: 8px;
+    padding: 30px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 20px;
+
+    h2 {
+      font-size: 2.5rem;
+      letter-spacing: 6px;
+      text-align: center;
+      font-family: "Jersey 25", "Doom", monospace;
+      text-transform: uppercase;
+      font-weight: 900;
+      filter: drop-shadow(5px 5px 0px #000000);
+      margin: 0;
+      color: #ddd;
+    }
+
+    .pause-buttons {
+      display: flex;
+      width: 100%;
+      justify-content: space-evenly;
+      align-items: stretch;
+      flex-direction: column;
+    }
+
+    .pause-btn {
+      border: 6px groove #8b0000;
+      border-radius: 4px;
+      background: linear-gradient(180deg, #2a0a0a 0%, #0a0000 100%);
+      color: #cdcdcd;
+      /* Branco acinzentado por padrão */
+      padding: 12px 32px;
+      transition: all 0.3s ease;
+      cursor: pointer;
+      margin-top: 10px;
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.5);
+      font-family: "Jersey 25", "Science Gothic", monospace;
+      font-size: 1.4em;
+
+      &:hover {
+        box-shadow: 0 0 15px rgba(139, 0, 0, 0.4);
+        border-color: #ff0000cc;
+        color: #fff;
+      }
+
+      span {
+        font-size: 1.3rem;
+        font-family: "Science Gothic", monospace;
+        font-weight: bold;
+        background: linear-gradient(180deg, #ff3333 0%, #cc0000 100%);
+        -webkit-background-clip: text;
+        background-clip: text;
+        -webkit-text-fill-color: transparent;
+      }
+    }
+  }
+}
+
+@keyframes pauseDown {
+  0% {
+    transform: translateY(-100%);
+    opacity: 0;
+  }
+
+  100% {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+@keyframes overDoom {
+  0% {
+    transform: translateY(-100%);
+    opacity: 0;
+  }
+
+  100% {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+@keyframes shakeDoom {
+  0%,
+  100% {
+    transform: translate(0, 0);
+  }
+
+  10% {
+    transform: translate(-10px, -5px);
+  }
+
+  20% {
+    transform: translate(8px, 4px);
+  }
+
+  30% {
+    transform: translate(-6px, 6px);
+  }
+
+  40% {
+    transform: translate(4px, -4px);
+  }
+
+  50% {
+    transform: translate(-3px, 3px);
+  }
+
+  60% {
+    transform: translate(2px, -2px);
+  }
+
+  70% {
+    transform: translate(-1px, 1px);
+  }
+}
+
+@keyframes spinSkull {
+  0%,
+  100% {
+    transform: rotate(0deg);
+  }
+
+  25% {
+    transform: rotate(10deg);
+  }
+
+  75% {
+    transform: rotate(-10deg);
+  }
+}
+
+.blood-drip {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  background: repeating-linear-gradient(
+    180deg,
+    transparent,
+    transparent 90%,
+    rgba(139, 0, 0, 0.3) 90%,
+    rgba(139, 0, 0, 0.5) 95%
+  );
+  animation: drip 2s linear infinite;
+}
+
+@keyframes drip {
+  0% {
+    background-position: 0 0;
+  }
+
+  100% {
+    background-position: 0 20px;
+  }
+}

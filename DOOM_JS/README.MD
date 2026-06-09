@@ -3,6 +3,7 @@ DOOM JS - Recriação do clássico de 1993
 Sobre o projeto
 
 Este projeto é uma recriação fan-made do jogo DOOM (1993) da id Software, desenvolvida inteiramente em HTML5 Canvas, CSS3 e JavaScript puro. O objetivo é trazer a jogabilidade essencial do clássico para o navegador, mantendo a estética retrô e a brutalidade característica. O jogador controla um fuzileiro espacial que deve eliminar demônios, coletar munição, explorar fases e encontrar a saída de cada nível.
+Este projeto faz parte do trabalho da disciplina de Algoritmo e Estrutura de Dados, feito por uma equipe de 3 integrantes e com ajudo do professsor Maxwell.
 
 Funcionalidades
 
@@ -87,6 +88,8 @@ Observação: todas as imagens e fontes devem estar nos caminhos corretos para a
 Estrutura de arquivos essencial
 
 /index.html
+/script.js
+/style.css
 /font/
    DooM.ttf
    AmazDooMLeft.ttf
@@ -111,6 +114,17 @@ Estrutura de arquivos essencial
        RPG-7.png
 
 Créditos
+
+Desenvolvido por:
+Davi Augusto Alves de Assis
+Marcell Alves Resende
+Pedro Andrade dos Santos
+
+Tecnologias utilizadas:
+JavaScript (linguagem principal)
+HTML e CSS (parte visual)
+FontAwesone (icones)
+GoogleFonts (fontes)
 
 Inspirado no jogo DOOM (1993) da id Software.
 Desenvolvido por [seu nome ou nickname] como projeto de estudo e entretenimento.
