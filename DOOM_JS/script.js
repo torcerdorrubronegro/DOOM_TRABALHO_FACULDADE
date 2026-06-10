@@ -66,6 +66,7 @@ let projetilAtivo = null;
 let explosaoAtiva = null;
 let offscreenCanvas, offscreenCtx;
 let municaoCartucho = 0;
+let kitMedico = 0;
 // Elementos DOM
 const canvas = document.getElementById("doomCanvas");
 const doomFacePlayer = document.getElementById("doomFacePlayer");
@@ -136,6 +137,9 @@ const fases = {
       { x: 16, y: 7, tipo: "municao" },
       { x: 7, y: 4, tipo: "municao" },
       { x: 13, y: 12, tipo: "municao" },
+
+      { x: 2, y: 8, tipo: "vida" },
+      { x: 18, y: 8, tipo: "vida" },
     ],
     saida: { x: 20, y: 8 },
   },
@@ -190,6 +194,9 @@ const fases = {
       { x: 17, y: 5, tipo: "municao" },
       { x: 5, y: 11, tipo: "municao" },
       { x: 15, y: 12, tipo: "municao" },
+
+      { x: 10, y: 7, tipo: "vida" },
+      { x: 18, y: 12, tipo: "vida" },
     ],
     saida: { x: 20, y: 8 },
   },
@@ -258,6 +265,9 @@ const fases = {
       { x: 11, y: 4, tipo: "municao" },
       { x: 7, y: 11, tipo: "municao" },
       { x: 13, y: 11, tipo: "municao" },
+
+      { x: 10, y: 5, tipo: "vida" },
+      { x: 10, y: 12, tipo: "vida" },
     ],
     saida: { x: 20, y: 8 },
   },
@@ -267,6 +277,10 @@ const ITENS_CONFIG = {
   municao: {
     nome: "Munição",
     efeito: () => municaoCartucho++,
+  },
+  vida: {
+    nome: "Vida",
+    efeito: () => kitMedico++,
   },
 };
 
@@ -1539,6 +1553,56 @@ function desenharMapa() {
       ctx.fillRect(px + CELL_W / 2 - 6, py + CELL_H / 2 - 5, 1, 9);
       ctx.fillStyle = "rgba(255, 255, 255, 0.15)";
       ctx.fillRect(px + CELL_W / 2 - 4, py + CELL_H / 2 - 10, 4, 3);
+    } else if (item.tipo === "vida") {
+      // 1. Variáveis de centro para não ter que repetir os cálculos
+      const cx = px + CELL_W / 2;
+      const cy = py + CELL_H / 2;
+
+      // 2. Efeito de flutuação suave baseado no tempo
+      const floatOffset = Math.sin(Date.now() / 200) * 3;
+      const itemY = cy + floatOffset;
+
+      ctx.shadowBlur = 0; // Mantém o visual retrô "pixelado" e seco
+
+      // 3. Sombra no chão (elipse que fica parada enquanto o item flutua)
+      ctx.fillStyle = "rgba(0, 0, 0, 0.4)";
+      ctx.beginPath();
+      // ellipse(x, y, radiusX, radiusY, rotation, startAngle, endAngle)
+      ctx.ellipse(cx, cy + 14, 16, 5, 0, 0, Math.PI * 2);
+      ctx.fill();
+
+      // 4. Contorno preto (Outline) ao redor da caixa inteira
+      ctx.fillStyle = "#000000";
+      ctx.fillRect(cx - 15, itemY - 12, 30, 24);
+
+      // Fundo branco principal
+      ctx.fillStyle = "#f0f0f0";
+      ctx.fillRect(cx - 14, itemY - 11, 28, 22);
+
+      // Bordas cinzas para dar profundidade
+      ctx.fillStyle = "#8b8b8b";
+      ctx.fillRect(cx - 14, itemY - 11, 28, 2); // Topo
+      ctx.fillRect(cx - 14, itemY - 11, 2, 22); // Esquerda
+      ctx.fillRect(cx + 12, itemY - 11, 2, 22); // Direita
+      ctx.fillRect(cx - 14, itemY + 9, 28, 2); // Fundo
+
+      // Sombra interna para a "frente" da caixa
+      ctx.fillStyle = "#d0d0d0";
+      ctx.fillRect(cx - 12, itemY - 9, 24, 18);
+
+      // Cruz vermelha (agora centralizada com as novas variáveis)
+      ctx.fillStyle = "#e31b23";
+      ctx.fillRect(cx - 8, itemY - 3, 16, 6); // Horizontal
+      ctx.fillRect(cx - 3, itemY - 8, 6, 16); // Vertical
+
+      // Brilho na cruz para volume
+      ctx.fillStyle = "#ff6b6b";
+      ctx.fillRect(cx - 6, itemY - 2, 4, 2);
+      ctx.fillRect(cx - 2, itemY - 6, 2, 4);
+
+      // Tampa/Alça da caixa (agora como um detalhe acima do branco)
+      ctx.fillStyle = "#555555";
+      ctx.fillRect(cx - 6, itemY - 14, 12, 3);
     }
   }
 
@@ -2045,6 +2109,8 @@ function handleKeyDown(e) {
     "F",
     "q",
     "Q",
+    "h",
+    "H",
     "1",
     "2",
     "3",
@@ -2064,6 +2130,10 @@ function handleKeyDown(e) {
   if (jogoAtivo) {
     if (key === "r" || key === "R") {
       recarregarMunicao();
+      return;
+    } else if (key === "h" || key === "H") {
+      usarKitMedico();
+      console.log(vida);
       return;
     }
   }
@@ -2120,7 +2190,7 @@ function handleKeyDown(e) {
 
 function recarregarMunicao() {
   let arma = ARMAS[armaEquipada];
-  if (municaoCartucho > 0) {
+  if (arma.municaoAtual < arma.municaoMax && municaoCartucho > 0) {
     if (arma.municaoMax !== -1) {
       let quantidade = Math.floor(arma.municaoMax * 0.25);
       arma.municaoAtual = Math.min(
@@ -2130,7 +2200,23 @@ function recarregarMunicao() {
       addLog(`+${quantidade} munição para ${arma.nome}!`);
       atualizarInterfaceArmas();
       municao();
-      municaoCartucho--
+      municaoCartucho--;
+    }
+  }
+}
+
+function usarKitMedico() {
+  if (vida < 100 && kitMedico > 0) {
+    vida += 20;
+    atualizarUI()
+    const efeito = document.createElement("div")
+    efeito.classList.add("vidaEfeito")
+    document.body.appendChild(efeito)
+    setTimeout(() => {
+      efeito.classList.remove("vidaEfeito")
+    }, 500);
+    if (vida > 100) {
+      vidaJogador = 100; 
     }
   }
 }
