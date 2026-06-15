@@ -20,44 +20,55 @@
   <div class="container">
     <div class="tutorial-container" id="tutorialContainer">
       <div class="tutorial-box">
+
         <div class="tutorial-card movimentacao">
           <div class="tutorial-id">1</div>
           <div class="tutorial-title">
-            <h2>Movimentação (WASD + Setas)</h2>
+            <h2>Controles e Movimentação</h2>
           </div>
-          <div class="tutorial-content splits-layout">
-            <div class="movement-visual">
-              <div class="arrow-container">
-                <div class="arrow active-key">
-                  <p>W</p>
-                  <i class="fa-solid fa-caret-up direction-arrow up"></i>
+          <div class="tutorial-content splits-content">
+            <div class="splits-layout">
+              <div class="movement-visual">
+                <div class="arrow-container">
+                  <div class="arrow active-key">
+                    <p>W</p>
+                    <i class="fa-solid fa-caret-up direction-arrow up"></i>
+                  </div>
+                  <span>
+                    <div class="arrow active-key">
+                      <i class="fa-solid fa-caret-left direction-arrow left"></i>
+                      <p>A</p>
+                    </div>
+                    <div class="arrow active-key">
+                      <p>S</p>
+                      <i class="fa-solid fa-caret-down direction-arrow down"></i>
+                    </div>
+                    <div class="arrow active-key">
+                      <p>D</p>
+                      <i class="fa-solid fa-caret-right direction-arrow right"></i>
+                    </div>
+                  </span>
                 </div>
-                <span>
-                  <div class="arrow active-key">
-                    <i class="fa-solid fa-caret-left direction-arrow left"></i>
-                    <p>A</p>
-                  </div>
-                  <div class="arrow active-key">
-                    <p>S</p>
-                    <i class="fa-solid fa-caret-down direction-arrow down"></i>
-                  </div>
-                  <div class="arrow active-key">
-                    <p>D</p>
-                    <i class="fa-solid fa-caret-right direction-arrow right"></i>
-                  </div>
-                </span>
               </div>
-            </div>
-            <div class="arrow-info">
-              <p><strong>W / Seta Acima:</strong> Frente</p>
-              <p><strong>A / Seta Esquerda:</strong> Esquerda</p>
-              <p><strong>D / Seta Direita:</strong> Direita</p>
-              <p><strong>S / Seta Abaixo:</strong> Trás</p>
+              <div class="arrow-info">
+                <div>
+                  <p><strong>W / Seta Acima:</strong> Frente</p>
+                  <p><strong>A / Seta Esq:</strong> Esquerda</p>
+                  <p><strong>D / Seta Dir:</strong> Direita</p>
+                  <p><strong>S / Seta Abaixo:</strong> Trás</p>
+                </div>
+                <div>
+                  <p><strong>R / r:</strong> Recarregar</p>
+                  <p><strong>H / h:</strong> Kit médico</p>
+                  <p><strong>Q / q:</strong> Pause</p>
+                  <p><strong>Espaço:</strong> Atirar</p>
+                </div>
+              </div>
             </div>
           </div>
         </div>
 
-        <div class="tutorial-card mecanicas">
+        <div class="tutorial-card mecanicas" style="height: auto; min-height: 365px;">
           <div class="tutorial-id">2</div>
           <div class="tutorial-title">
             <h2>Mecânicas Fundamentais</h2>
@@ -73,16 +84,13 @@
               <div class="mechanic-icon">
                 <i class="fa-solid fa-crosshairs"></i>
               </div>
-              <p>
-                O <strong>Mouse define a mira</strong> (controla totalmente a
-                visão e direção do tiro).
-              </p>
-            </div>
-            <div class="mechanic-row text-highlight">
-              <div class="mechanic-icon score-badge">100</div>
-              <p>
-                <strong>Pontos atribuídos</strong> por cada inimigo abatido.
-              </p>
+              <div style="display: flex; flex-direction: row; align-items: center;">
+                <p style="flex: 1;">O <strong>Mouse define a mira</strong> (controla totalmente a visão e direção do tiro).</p>
+                <div class="mouse-img">
+                  <i class="fa-solid fa-xmark"></i>
+                  <img src="./img/doom-mira.png" alt="Exemplo de Mira">
+                </div>
+              </div>
             </div>
           </div>
         </div>
@@ -92,72 +100,58 @@
         <div class="tutorial-card hud rows-expanded">
           <div class="tutorial-id">4</div>
           <div class="tutorial-title">
-            <h2>Conheça seu HUD (Interface Detalhada)</h2>
+            <h2>Conheça seu HUD</h2>
           </div>
-          <div class="tutorial-content hud-layout">
-            <div class="hud-explanation">
-              <div class="info-block pointer-right">
-                <p>
-                  <strong>Barra de Vida (Health):</strong> Efeito pulsante
-                  crítico se menor que 30%.
-                </p>
-              </div>
-              <div class="info-block pointer-right">
-                <p>
-                  <strong>Contador de Munição (Ammo):</strong> Exibição
-                  simultânea visual e numérica.
-                </p>
-              </div>
-              <div class="info-block pointer-right">
-                <p>
-                  <strong>Painel de Console:</strong> Logs de eventos em tempo
-                  real do sistema.
-                </p>
-              </div>
+          <div class="tutorial-content hud-layout"
+            style="flex-direction: column; justify-content: flex-start; gap: 15px;">
+            <div class="hub-image">
+              <img src="./img/doom-infoBar.png" alt="Barra de Informações HUD">
             </div>
 
-            <div class="hud-mockup">
-              <div class="hud-row-top">
-                <div class="hud-stat highlight-red">
-                  100% <span>HEALTH</span>
-                </div>
-                <div class="hud-face"><i class="fa-solid fa-skull"></i></div>
-                <div class="hud-stat highlight-red">
-                  0% <span>ARMOR</span>
-                </div>
-                <div class="hud-stat highlight-yellow">
-                  50 <span>AMMO</span>
-                </div>
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px; width: 100%;">
+              <div class="info-block pointer-right" style="width: 100%; box-sizing: border-box;">
+                <p><strong>Barra de Vida:</strong> Efeito pulsante crítico se menor que 30%.</p>
               </div>
-              <div class="hud-row-bottom">
-                <div class="hud-weapon-view">
-                  <i class="fa-solid fa-gun"></i>
-                </div>
-                <div class="hud-ammo-bar">
-                  <span></span><span></span><span></span>
-                </div>
+              <div class="info-block pointer-right" style="width: 100%; box-sizing: border-box;">
+                <p><strong>Munição:</strong> Exibição simultânea visual e numérica.</p>
               </div>
-            </div>
-
-            <div class="hud-explanation">
-              <div class="info-block pointer-left">
-                <p>
-                  <strong>Inimigos Restantes:</strong> Quantidade de demônios
-                  vivos no mapa.
-                </p>
+              <div class="info-block pointer-right" style="width: 100%; box-sizing: border-box;">
+                <p><strong>Console:</strong> Logs de eventos em tempo real do sistema.</p>
               </div>
-              <div class="info-block pointer-left">
-                <p>
-                  <strong>Imagem & Barra Visual:</strong> Identificador rápido
-                  do armamento ativo.
-                </p>
+              <div class="info-block pointer-left" style="width: 100%; box-sizing: border-box;">
+                <p><strong>Inimigos Restantes:</strong> Quantidade de demônios vivos.</p>
+              </div>
+              <div class="info-block pointer-left" style="grid-column: span 2; width: 100%; box-sizing: border-box;">
+                <p><strong>Arma Ativa:</strong> Imagem e barra identificadora do armamento em uso.</p>
               </div>
             </div>
           </div>
         </div>
 
-        <div class="tutorial-card fases-exploracao">
+        <div class="tutorial-card itens-mapa rows-expanded" style="width: 520px; min-height: 280px;">
           <div class="tutorial-id">5</div>
+          <div class="tutorial-title">
+            <h2>Itens e Suprimentos</h2>
+          </div>
+          <div class="tutorial-content mechanics-layout">
+            <div class="mechanic-row">
+              <div class="mechanic-icon">
+                <i class="fa-solid fa-boxes-packing"></i>
+              </div>
+              <p><strong>Cartucho de Munição:</strong> Recarrega <strong>25% da munição total</strong>, independente da
+                arma que estiver empunhando.</p>
+            </div>
+            <div class="mechanic-row">
+              <div class="mechanic-icon">
+                <i class="fa-solid fa-briefcase-medical"></i>
+              </div>
+              <p><strong>Kit Médico:</strong> Recupera <strong>20 de vida</strong> instantaneamente ao coletar.</p>
+            </div>
+          </div>
+        </div>
+
+        <div class="tutorial-card fases-exploracao">
+          <div class="tutorial-id">6</div>
           <div class="tutorial-title">
             <h2>Objetivo do Jogo</h2>
           </div>
@@ -165,15 +159,15 @@
             <div class="objective-text">
               <p>
                 <strong>Demônios e Saída:</strong> Cada nível possui um mapa diferente com uma saída e diversos
-                inimigos. O objetivo é encontrar a saída, matando a
-                hordas de demônios.
+                inimigos. O objetivo é encontrar a saída, matando as hordas de demônios.
               </p>
             </div>
           </div>
         </div>
+
         <div class="tutorial-buttons-actions" id="buttonsActions">
-          <button class="btn-tutorial-action" id="btnActionBack">Voltar</button>
-          <button class="btn-tutorial-action" id="btnActionProceed">Continuar</button>
+          <button class="doom-btn" id="btnActionBack">Voltar</button>
+          <button class="doom-btn" id="btnActionProceed">Continuar</button>
         </div>
       </div>
     </div>
@@ -215,7 +209,7 @@
 
           <p><strong>VERSÃO:</strong> 1.0.0</p>
 
-          <p><strong>DATA DE LANÇAMENTO:</strong> 2025</p>
+          <p><strong>DATA DE LANÇAMENTO:</strong> 2026</p>
 
           <p><strong>CRÉDITOS ESPECIAIS:</strong></p>
           <ul>
@@ -273,10 +267,21 @@
             <div class="gun-content" id="gunContent"></div>
             <p class="gun-description"></p>
           </div>
-          <div class="stat inimigos-rest-container">
-            <p class="stat-title" style="line-height: 2">ALVOS RESTANTES:</p>
-            <div class="divider"></div>
-            <span id="inimigosRest" class="stat-text">6</span>
+          <div class="hud-stats stat">
+            <div class="hud-stat-row">
+              <span class="hud-label stat-title">Alvos Restantes</span>
+              <span class="hud-value" id="alvosRestantes">0</span>
+            </div>
+            <div class="hud-divider"></div>
+            <div class="hud-stat-row">
+              <span class="hud-label stat-title">Kit Médico</span>
+              <span class="hud-value" id="kitMedico">0</span>
+            </div>
+            <div class="hud-divider"></div>
+            <div class="hud-stat-row">
+              <span class="hud-label stat-title">Cartuchos</span>
+              <span class="hud-value" id="cartuchos">0</span>
+            </div>
           </div>
           <div class="controls-tip stat">
             <p class="stat-title">Movimentação</p>
@@ -344,17 +349,17 @@
         <div class="btn-action-container">
           <div class="menu-row">
             <div class="arrow-slot"></div>
-            <button class="btn-action" id="start">Novo Jogo</button>
+            <button class="doom-btn" id="start">Novo Jogo</button>
           </div>
 
           <div class="menu-row">
             <div class="arrow-slot"></div>
-            <button class="btn-action" id="tutorial">Tutorial</button>
+            <button class="doom-btn" id="tutorial">Tutorial</button>
           </div>
 
           <div class="menu-row">
             <div class="arrow-slot"></div>
-            <button class="btn-action" id="creditos">Créditos</button>
+            <button class="doom-btn" id="creditos">Créditos</button>
           </div>
         </div>
       </div>
@@ -367,23 +372,19 @@
       </div>
       <div class="gameover-content">
         <div class="gameover-row">
-          <h5>Alvos:</h5>
-          <span id="alvos-value">0/0</span>
+          <h5>Pontuação:</h5>
+          <span id="score-value">0</span>
         </div>
         <div class="gameover-row">
           <h5>Tempo:</h5>
           <span id="time-value">00:00</span>
         </div>
-        <div class="gameover-row">
-          <h5>Score final:</h5>
-          <span id="score-value">0</span>
-        </div>
       </div>
       <div class="gameover-btn-container">
-        <button id="quitButton" class="gameover-btn">
+        <button id="quitButton" class="doom-btn">
           <span>Sair</span>
         </button>
-        <button id="actionButton" class="gameover-btn">
+        <button id="actionButton" class="doom-btn">
           <span>Continuar</span>
         </button>
       </div>
@@ -393,13 +394,12 @@
     <div class="pause-content">
       <h2>Jogo Pausado</h2>
       <div class="pause-buttons">
-        <button id="resumeButton" class="pause-btn">Retomar</button>
-        <button id="restartButton" class="pause-btn">Reiniciar</button>
-        <button id="mainMenuButton" class="pause-btn">Menu Principal</button>
+        <button id="resumeButton" class="doom-btn">Retomar</button>
+        <button id="restartButton" class="doom-btn">Reiniciar</button>
+        <button id="mainMenuButton" class="doom-btn">Menu Principal</button>
       </div>
     </div>
   </div>
-
   <script src="script.js"></script>
 </body>
 

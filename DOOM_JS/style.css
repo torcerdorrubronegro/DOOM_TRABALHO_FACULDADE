@@ -1,6 +1,20 @@
 @import url("https://fonts.googleapis.com/css2?family=DotGothic16&display=swap");
 @import url("https://fonts.googleapis.com/css2?family=Jersey+25&family=Michroma&family=Press+Start+2P&family=Science+Gothic:wght@100..900&display=swap");
 
+:root {
+  --dark-red: #8b0000;
+  --pure-red: #ff0000;
+  --doom-gold: #ffcc00;
+  --fire-orange: #ffaa00;
+  --neon-green: #2ecc2e;
+  --military-green: #255122;
+  --steel-dark: #1a1a1a;
+  --steel-light: #4e4e4e;
+  --off-white: #e0e0e0e0;
+  --dirty-gray: #a0a0a0;
+  --abyss-black: #0a0c0e;
+  --white: #fff;
+}
 @font-face {
   font-family: "Doom";
   src: url("font/DooM.ttf");
@@ -43,28 +57,50 @@ body {
   border: 40px ridge transparent;
   border-image: repeating-linear-gradient(
       45deg,
-      #1a1a1ade 40px,
-      #202020e0 80px,
-      #121212ef 120px
+      var(--abyss-black) 40px,
+      var(--steel-dark) 80px,
+      var(--abyss-black) 120px
     )
     30;
-
-  /* O TRUQUE DO DOOM: Sombras para dar profundidade de metal chanfrado */
   box-shadow:
-    inset 0 0 20px rgba(0, 0, 0, 0.4),
-    inset 5px 5px 0px rgba(255, 255, 255, 0.1),
-    inset -5px -5px 0px rgba(0, 0, 0, 0.3);
+    inset 0 0 20px var(--abyss-black),
+    inset 5px 5px 0px var(--steel-dark),
+    inset -5px -5px 0px var(--abyss-black);
   position: relative;
 }
 
-.vidaEfeito {
-  width: 100%;
-  height: 100%;
-  background-color: rgba(0, 0, 0, 0.1);
-  position: absolute;
+body.curando::after {
+  content: "";
+  position: fixed;
   top: 0;
   left: 0;
-  box-shadow: inset 0 4px 30px green;
+  width: 100%;
+  height: 100%;
+  animation: vidaFlash 1s ease;
+  background-color: transparent;
+}
+
+@keyframes vidaFlash {
+  0% {
+    box-shadow: inset 0 0 0 transparent;
+  }
+  50% {
+    box-shadow: inset 0 0.25em 32em var(--neon-green);
+  }
+  100% {
+    box-shadow: inset 0 0 0 transparent;
+  }
+}
+
+@keyframes floatUp {
+  0% {
+    opacity: 1;
+    transform: translateX(-50%) translateY(0);
+  }
+  100% {
+    opacity: 0;
+    transform: translateX(-50%) translateY(-60px);
+  }
 }
 
 body::after {
@@ -73,7 +109,7 @@ body::after {
   left: 0;
   width: 100%;
   height: 100%;
-  background-color: rgba(0, 0, 0, 0.4);
+  background-color: color-mix(in srgb, var(--abyss-black) 40%, transparent);
   backdrop-filter: blur(5px);
   z-index: -1;
   position: absolute;
@@ -103,10 +139,9 @@ body::after {
   height: 100%;
   background: radial-gradient(
     circle,
-    rgba(139, 0, 0, 0) 0%,
-    rgba(139, 0, 0, 0.3) 50%,
-    rgba(180, 0, 0, 0.6) 80%,
-    rgba(100, 0, 0, 0.8) 100%
+    transparent 0%,
+    transparent 40%,
+    var(--dark-red) 100%
   );
   mix-blend-mode: multiply;
 }
@@ -196,7 +231,6 @@ body::after {
   height: 100%;
   pointer-events: none;
   z-index: 999;
-  box-shadow: inset 0 0 50px 20px rgba(255, 0, 0, 0);
   animation: redPulse 0.5s ease-out forwards;
 }
 
@@ -271,7 +305,7 @@ body::after {
   align-items: center;
   justify-content: flex-start;
   padding: 2em;
-  color: #ffcc44;
+  color: var(--doom-gold);
   font-size: 1.1rem;
   font-family: "Science Gothic", "Press Start 2P", monospace;
   font-weight: 500;
@@ -279,18 +313,18 @@ body::after {
   text-align: justify;
   background: repeating-linear-gradient(
     135deg,
-    rgba(27, 27, 27, 0.95) 0px,
-    rgba(27, 27, 27, 0.9) 10px,
-    rgba(27, 27, 27, 0.95) 50px
+    color-mix(in srgb, var(--steel-dark) 90%, transparent) 0px,
+    color-mix(in srgb, var(--steel-dark) 95%, transparent) 10px,
+    color-mix(in srgb, var(--steel-dark) 90%, transparent) 50px
   );
-  border: 3px ridge #8b0000;
+  border: 3px ridge var(--dark-red);
   box-shadow:
-    0 0 30px rgba(139, 0, 0, 0.3),
-    inset 0 0 20px rgba(0, 0, 0, 0.5);
+    0 0 30px color-mix(in srgb, var(--dark-red) 30%, transparent),
+    inset 0 0 20px color-mix(in srgb, var(--dark-red) 50%, transparent);
   border-radius: 8px;
   overflow-y: auto;
   scrollbar-width: thin;
-  scrollbar-color: #8b0000 #2a0000;
+  scrollbar-color: var(--pure-red) var(--dark-red);
   transform: perspective(350px);
 }
 
@@ -299,12 +333,12 @@ body::after {
 }
 
 .credits-container .credits-content::-webkit-scrollbar-track {
-  background: #2a0000;
+  background: var(--dark-red);
   border-radius: 3px;
 }
 
 .credits-container .credits-content::-webkit-scrollbar-thumb {
-  background: #8b0000;
+  background: var(--pure-red);
   border-radius: 3px;
 }
 
@@ -321,17 +355,17 @@ body::after {
   text-transform: uppercase;
   font-family: "Doom", "AmazDoomR", monospace;
   letter-spacing: 4px;
-  color: #ff0000;
+  color: var(--pure-red);
   text-shadow:
-    0 0 10px #ff0000,
-    0 0 5px #8b0000;
+    0 0 4px var(--pure-red),
+    0 0 1px var(--dark-red);
 }
 
 .credits-container .credits-content h3 {
   text-align: center;
   font-size: 1.2rem;
   margin-bottom: 30px;
-  color: #ffaa00;
+  color: var(--fire-orange);
   text-transform: uppercase;
   letter-spacing: 2px;
 }
@@ -342,7 +376,7 @@ body::after {
 }
 
 .credits-container .credits-content strong {
-  color: #ff6b6b;
+  color: var(--pure-red);
   font-weight: bold;
   text-transform: uppercase;
 }
@@ -359,7 +393,7 @@ body::after {
 
 .credits-container .credits-content li::before {
   content: "►";
-  color: #ff0000;
+  color: var(--pure-red);
   position: absolute;
   left: -20px;
   font-size: 0.8rem;
@@ -369,10 +403,10 @@ body::after {
   display: block;
   text-align: center;
   margin-top: 25px;
-  color: #ffaa00;
+  color: var(--fire-orange);
   font-style: normal;
   font-size: 0.8rem;
-  border-top: 1px solid #8b0000;
+  border-top: 1px solid var(--dark-red);
   padding-top: 15px;
 }
 
@@ -425,10 +459,10 @@ body::after {
   position: absolute;
   top: 0;
   left: 0;
-  color: white;
+  color: var(--white);
   width: 100%;
   height: 100%;
-  background-color: rgba(0, 0, 0, 0.45);
+  background-color: color-mix(in srgb, var(--abyss-black) 45%, transparent);
   backdrop-filter: blur(5px);
   justify-content: center;
   align-items: center;
@@ -448,14 +482,14 @@ body::after {
     .tutorial-card {
       background: repeating-linear-gradient(
         135deg,
-        #192717be 0px,
-        #1927175b 2px,
-        #192717 5px
+        color-mix(in srgb, var(--steel-dark) 95%, transparent) 0px,
+        color-mix(in srgb, var(--abyss-black) 5%, transparent) 2px,
+        color-mix(in srgb, var(--steel-dark) 95%, transparent) 15px
       );
       box-shadow: 3px 3px 15px rgba(0, 0, 0, 0.6);
       box-sizing: border-box;
       border-radius: 6px;
-      border: 5px solid #424242;
+      border: 5px solid var(--steel-light);
       overflow: visible;
       font-family: "Arial", sans-serif;
       position: relative;
@@ -468,7 +502,7 @@ body::after {
       }
 
       &.mecanicas {
-        width: 460px;
+        width: 560px;
         height: 365px;
       }
 
@@ -478,8 +512,8 @@ body::after {
       }
 
       &.hud {
-        width: 520px;
-        height: 440px;
+        width: 820px;
+        max-height: 440px;
       }
 
       &.inimigos {
@@ -502,7 +536,7 @@ body::after {
       }
 
       .tutorial-id {
-        background-color: #3b473e;
+        background-color: var(--dirty-gray);
         display: flex;
         width: 36px;
         height: 36px;
@@ -515,20 +549,18 @@ body::after {
         border-radius: 4px;
         font-size: 1.1em;
         font-weight: bold;
-        border: 2px solid #192717;
         box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.5);
         font-family: "Press Start 2P", monospace;
-        color: #fff;
+        color: var(--steel-light);
         z-index: 10;
       }
 
       .tutorial-title {
-        background-color: #22371e;
+        background-color: var(--military-green);
         image-rendering: pixelated;
         display: flex;
         align-items: center;
-        border-bottom: 3px solid #0b120a;
-        box-shadow: 0px 3px 5px rgba(0, 0, 0, 0.4);
+        justify-content: center;
         padding: 10px 15px 10px 25px;
 
         h2 {
@@ -538,7 +570,7 @@ body::after {
           text-transform: uppercase;
           text-shadow: 2px 2px 0px #000;
           letter-spacing: 1px;
-          color: #e2e2e2;
+          color: var(--off-white);
         }
       }
 
@@ -558,17 +590,22 @@ body::after {
           font-family: "Arial";
 
           strong {
-            color: #ffcc00;
+            color: var(--doom-gold);
           }
         }
 
-        &.splits-layout {
+        &.splits-content {
+          flex-direction: column;
+        }
+
+        .splits-layout {
+          display: flex;
           justify-content: space-between;
           align-items: center;
+          flex: 1;
         }
 
         .movement-visual {
-          position: relative;
           padding: 10px;
         }
 
@@ -585,8 +622,7 @@ body::after {
           }
 
           .arrow {
-            background-color: #333;
-            border: 2px outset #555;
+            background-color: var(--steel-dark);
             border-radius: 4px;
             width: 44px;
             height: 44px;
@@ -594,37 +630,36 @@ body::after {
             align-items: center;
             justify-content: center;
             position: relative;
+            border: 4px outset var(--steel-light);
 
             p {
               margin: 0;
               font-family: "Press Start 2P", monospace;
               font-size: 0.8em;
               font-weight: bold;
-              color: #fff;
-              background-color: rgba(0, 0, 0, 0.1);
+              color: var(--white);
               width: 40px;
               height: 40px;
               border-radius: 4px;
               display: flex;
               align-items: center;
               justify-content: center;
-              border: 4px outset #000;
             }
 
             .direction-arrow {
               position: absolute;
-              color: #2979ff;
+              color: var(--military-green);
               font-size: 1.2em;
               text-shadow: 0 0 4px rgba(0, 0, 0, 0.8);
 
               &.up {
                 bottom: 110%;
-                left: 15%;
+                left: 11%;
               }
 
               &.down {
                 top: 110%;
-                left: 15%;
+                left: 11%;
               }
 
               &.left {
@@ -641,18 +676,18 @@ body::after {
         }
 
         .arrow-info {
-          display: flex;
-          flex-direction: column;
           gap: 6px;
           flex: 1;
           padding-left: 1em;
+          display: grid;
+          grid-template-columns: 1fr 1fr;
+          width: 100%;
 
           .highlight-note {
-            font-family: "Press Start 2P", monospace;
             font-size: 0.65em;
-            color: #ff3d00;
+            color: var(--fire-orange);
             margin-top: 5px;
-            text-shadow: 1px 1px 0 #000;
+            text-shadow: 1px 1px 0 var(--abyss-black);
           }
         }
 
@@ -675,15 +710,15 @@ body::after {
               background: rgba(0, 0, 0, 0.5);
               padding: 6px;
               border-radius: 4px;
-              border-left: 3px solid #ffcc00;
+              border-left: 3px solid var(--doom-gold);
 
               .weapon-key {
                 font-family: "Press Start 2P", monospace;
-                background: #424242;
+                background: var(--steel-light);
                 padding: 4px 8px;
                 font-size: 0.7em;
                 border-radius: 2px;
-                color: #ffcc00;
+                color: var(--doom-gold);
               }
 
               .weapon-details {
@@ -697,7 +732,7 @@ body::after {
 
                 .weapon-stats {
                   font-size: 0.75em;
-                  color: #a0a0a0;
+                  color: var(--off-white);
                 }
               }
             }
@@ -721,8 +756,8 @@ body::after {
         }
 
         .damage-system-box {
-          background-color: #0b1a0b;
-          border: 3px dashed #00ff00;
+          background-color: var(--military-green);
+          border: 3px dashed var(--neon-green);
           padding: 12px;
           border-radius: 4px;
           box-shadow: 0 0 10px rgba(0, 255, 0, 0.2);
@@ -733,7 +768,7 @@ body::after {
             font-size: 0.9em;
             text-shadow: 1px 1px 2px #000;
             margin: 0 0 8px 0;
-            color: #019201;
+            color: var(--neon-green);
           }
 
           p {
@@ -742,7 +777,7 @@ body::after {
           }
 
           strong {
-            color: #00ff00;
+            color: var(--neon-green);
             text-shadow: 0 0 5px rgba(0, 255, 0, 0.5);
           }
         }
@@ -759,6 +794,35 @@ body::after {
             background: rgba(0, 0, 0, 0.5);
             padding: 8px;
             border-radius: 4px;
+            width: 100%;
+            max-height: 140px;
+
+            p {
+              white-space: wrap;
+            }
+
+            .mouse-img {
+              flex: 2;
+              max-height: 100px;
+              overflow: hidden;
+              border: 3px double var(--steel-light);
+              border-radius: 4px;
+              position: relative;
+
+              i {
+                top: 50px;
+                left: 10px;
+                position: absolute;
+                transform: rotate(45deg);
+              }
+
+              img {
+                width: 100%;
+                height: 100%;
+                object-fit: contain;
+                object-position: center;
+              }
+            }
 
             .mechanic-icon {
               width: 36px;
@@ -792,6 +856,19 @@ body::after {
           justify-content: space-between;
           align-items: center;
           gap: 8px;
+
+          .hub-image {
+            width: 100%;
+            height: 50%;
+
+            img {
+              width: 100%;
+              height: 100%;
+              object-fit: cover;
+              object-position: center;
+              border: 3px double #555;
+            }
+          }
 
           .hud-explanation {
             display: flex;
@@ -985,13 +1062,13 @@ body::after {
     /* TEXTURA DO PAINEL PRINCIPAL: Metal escovado simulando chapa pesada */
     background: repeating-linear-gradient(
       45deg,
-      #1b1b1b 0px,
+      var(--steel-dark) 0px,
       transparent 1px,
-      #1b1b1bf6 5px
+      var(--steel-dark) 5px
     );
 
     /* BORDA RETRÔ: Simula o chanfrado de metal 3D dos anos 90 (Estilo Bevel) */
-    border: 8px groove #3a3a3a;
+    border: 8px groove var(--steel-light);
     position: relative;
 
     .character-image-container {
@@ -1002,17 +1079,16 @@ body::after {
       align-items: flex-end;
       /* Coloca o Doomguy pisando no chão da caixinha */
       overflow: hidden;
-      border: 3px ridge #1a1a1a;
+      border: 3px ridge var(--steel-dark);
 
       /* O GRADIENTE DO NICHO: Escuro -> Claro -> Escuro (Simula curvatura de metal iluminado) */
       background: repeating-radial-gradient(
         ellipse at center,
-
-        #1b1b1b 0%,
-        #201a12 20%,
-        #1b1b1b 50%,
-        #1b160f 80%,
-        #1b1b1b 100%
+        var(--steel-dark) 0%,
+        var(--abyss-black) 25%,
+        var(--steel-dark) 50%,
+        var(--abyss-black) 75%,
+        var(--steel-dark) 100%
       );
 
       /* Sombra interna pesada para dar o efeito de "recorte/buraco" na parede */
@@ -1041,7 +1117,7 @@ body::after {
       height: 100%;
 
       > p {
-        color: #fff;
+        color: var(--white);
         font-weight: 700;
         letter-spacing: 1.1;
         text-align: center;
@@ -1068,13 +1144,13 @@ body::after {
         font-family: "Jersey 25", monospace;
 
         span {
-          color: #ff0000;
+          color: var(--pure-red);
           font-weight: bold;
           text-shadow: 1px 1px 0px #000;
         }
 
         p {
-          color: #df9b00;
+          color: var(--doom-gold);
           font-weight: 400;
           margin: 0;
           text-shadow: 1px 1px 0px #000;
@@ -1127,19 +1203,31 @@ body::after {
   flex-direction: column;
   border-radius: 4px;
   width: 420px;
+
+  &::after {
+    content: "Aperte [Enter] para selecionar uma opção";
+    position: absolute;
+    transform: translateY(100%);
+    bottom: 0;
+    font-size: 1.1em;
+    color: var(--white);
+    font-weight: 700;
+    font-family: "Arial";
+    text-shadow: 0 0 4px var(--abyss-black);
+  }
 }
 
 .btn-action-container {
   display: flex;
   flex-direction: column;
-  gap: 12px;
+  align-items: stretch;
   width: 100%;
 }
 
 .menu-row {
   display: flex;
   flex-direction: row;
-  align-items: center;
+  align-items: stretch;
   justify-content: center;
   width: 100%;
   position: relative;
@@ -1156,45 +1244,7 @@ body::after {
   text-shadow: 2px 2px 3px #000;
   position: absolute;
   left: 0;
-  animation: arrowFade .3s ease;
-}
-
-.btn-action {
-  color: #bbbbbb;
-  background: linear-gradient(180deg, #2a2a2a 0%, #151515 100%);
-  border: 6px ridge #4e4e4e;
-  box-shadow: inset 0 4px 10px rgba(0, 0, 0, 0.1);
-  border-radius: 4px;
-  padding: 12px 0;
-  width: 80%;
-  text-align: center;
-  font-family: "Impact", "Arial Black", sans-serif;
-  font-size: 1.3em;
-  letter-spacing: 1.5px;
-  text-transform: uppercase;
-  text-shadow: 2px 2px 2px #000;
-  cursor: pointer;
-  transition: all 0.1s ease;
-}
-
-.btn-action:hover {
-  border-color: #6e6e6e;
-}
-
-.btn-active {
-  border: 6px ridge #ff00009c;
-  border-radius: 6px;
-  background: linear-gradient(180deg, #2a0a0a 0%, #0a0000 100%);
-  color: #ffffff;
-  padding: 12px 32px;
-  transition: all 0.3s ease;
-  cursor: pointer;
-  box-shadow: inset 0 4px 10px rgba(0, 0, 0, 0.5);
-  transform: scale(1.01);
-
-  &:hover {
-    border-color: #ff0000;
-  }
+  animation: arrowFade 0.3s ease;
 }
 
 .doom-panel {
@@ -1202,14 +1252,18 @@ body::after {
   display: flex;
   flex-direction: column;
   overflow: hidden;
-  border-radius: 0 0 1em 1em;
+  /* border-radius: 0 0 1em 1em; */
 }
 
 .info-bar {
   display: grid;
-  grid-template-columns: repeat(5, auto);
+  grid-template-columns: repeat(5, 1fr);
   height: 170px;
-  background: repeating-linear-gradient(180deg, #1b1b1b9f 0px, #1b1b1b9f 50px);
+  background: repeating-linear-gradient(
+    45deg,
+    var(--steel-dark) 9px,
+    var(--abyss-black) 10px
+  );
 }
 
 .stat {
@@ -1221,8 +1275,8 @@ body::after {
 }
 
 .stat-title {
-  font-family: "Press Start 2P";
-  font-size: 0.6em;
+  font-family: "Jersey 25";
+  font-size: 1em;
   font-weight: 600;
   color: #969696;
   letter-spacing: 5px;
@@ -1277,9 +1331,9 @@ body::after {
     width: 100%;
     background-image: repeating-linear-gradient(
       135deg,
-      #255122 1px,
-      transparent 10px,
-      #255122 10px
+      var(--neon-green) 1px,
+      var(--military-green) 10px,
+      var(--neon-green) 10px
     );
     background-size: 12px 100%;
     animation: moveStripes 0.6s linear infinite;
@@ -1377,18 +1431,41 @@ body::after {
   box-shadow: 1px 1px 8px #000;
 }
 
-.inimigos-rest-container {
+.hud-stats {
   display: flex;
   flex-direction: column;
-  align-items: center;
-  justify-content: space-evenly;
-  gap: 10px;
+  justify-content: space-around;
+  padding: 12px 16px;
+}
 
-  span {
-    color: #ff0000;
-    text-shadow: 1px 1px 4px #000;
-    font-size: 1.4em;
-  }
+.hud-stat-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 24px;
+}
+
+.hud-label {
+  color: #aaa;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  white-space: nowrap;
+}
+
+.hud-value {
+  color: #ff2222;
+  font-size: 1em;
+  font-weight: bold;
+  text-shadow: 0 0 6px #ff0000aa;
+  min-width: 32px;
+  text-align: right;
+  font-family: "Press Start 2P";
+}
+
+.hud-divider {
+  height: 0.5px;
+  background: #333;
+  margin: 2px 0;
 }
 
 .icon {
@@ -1600,10 +1677,36 @@ body::after {
   overflow: hidden;
 
   img {
-    width: 200px;
-    height: 200px;
+    width: 100%;
+    height: 100%;
     object-fit: cover;
     object-position: center;
+    display: block;
+  }
+}
+
+.doom-face-player.health {
+  &&::after {
+    content: "";
+    left: 0;
+    top: 0;
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    background-color: #00aa008f;
+    z-index: 99;
+    animation: healthAnimation 1s ease;
+  }
+}
+
+@keyframes healthAnimation {
+  0%,
+  100% {
+    opacity: 0;
+  }
+
+  50% {
+    opacity: 1;
   }
 }
 
@@ -1627,7 +1730,6 @@ body::after {
   object-fit: contain;
 
   background: #000;
-
   image-rendering: pixelated;
 
   box-shadow:
@@ -2026,37 +2128,6 @@ button:active {
   width: 100%;
   justify-content: space-evenly;
   align-items: center;
-
-  .gameover-btn {
-    border: 3px solid #8b0000;
-    border-radius: 4px;
-    background: linear-gradient(180deg, #2a0a0a 0%, #0a0000 100%);
-    color: #cdcdcd;
-    /* Branco acinzentado por padrão */
-    padding: 12px 32px;
-    transition: all 0.3s ease;
-    cursor: pointer;
-    margin-top: 10px;
-    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.5);
-
-    &:hover {
-      transform: scale(1.05);
-      box-shadow: 0 0 15px rgba(139, 0, 0, 0.8);
-      border-color: #ff0000;
-    }
-
-    span {
-      font-size: 1.3rem;
-      font-family: "Science Gothic", monospace;
-      font-weight: bold;
-      background: linear-gradient(180deg, #ff3333 0%, #cc0000 100%);
-      -webkit-background-clip: text;
-      background-clip: text;
-      -webkit-text-fill-color: transparent;
-      filter: drop-shadow(1px 1px 0px #000000);
-      letter-spacing: 2px;
-    }
-  }
 }
 
 .menu-pause {
@@ -2110,37 +2181,6 @@ button:active {
       justify-content: space-evenly;
       align-items: stretch;
       flex-direction: column;
-    }
-
-    .pause-btn {
-      border: 6px groove #8b0000;
-      border-radius: 4px;
-      background: linear-gradient(180deg, #2a0a0a 0%, #0a0000 100%);
-      color: #cdcdcd;
-      /* Branco acinzentado por padrão */
-      padding: 12px 32px;
-      transition: all 0.3s ease;
-      cursor: pointer;
-      margin-top: 10px;
-      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.5);
-      font-family: "Jersey 25", "Science Gothic", monospace;
-      font-size: 1.4em;
-
-      &:hover {
-        box-shadow: 0 0 15px rgba(139, 0, 0, 0.4);
-        border-color: #ff0000cc;
-        color: #fff;
-      }
-
-      span {
-        font-size: 1.3rem;
-        font-family: "Science Gothic", monospace;
-        font-weight: bold;
-        background: linear-gradient(180deg, #ff3333 0%, #cc0000 100%);
-        -webkit-background-clip: text;
-        background-clip: text;
-        -webkit-text-fill-color: transparent;
-      }
     }
   }
 }
@@ -2234,6 +2274,67 @@ button:active {
     rgba(139, 0, 0, 0.5) 95%
   );
   animation: drip 2s linear infinite;
+}
+
+/* ===== BOTÃO PADRÃO DOOM ===== */
+.doom-btn {
+  border: 6px ridge #ff00009c;
+  border-radius: 6px;
+  background: linear-gradient(180deg, #2a0a0a 0%, #0a0000 100%);
+  box-shadow: inset 0 4px 10px rgba(0, 0, 0, 0.1);
+  color: #ffffff;
+  font-family: "Impact", "Arial Black", sans-serif;
+  font-size: 1.3em;
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+  text-shadow: 2px 2px 2px #000;
+  margin-top: 10px;
+  padding: 12px 32px;
+  transition: all 0.3s ease;
+  cursor: pointer;
+  transform: scale(1.01);
+
+  &:hover {
+    border-color: #ff0000;
+  }
+}
+
+/* Botões do menu inicial: largura FIXA para todos ficarem iguais */
+.menu-inicial .doom-btn {
+  width: 340px; /* Mesma largura para Novo Jogo, Tutorial e Créditos */
+  margin: auto; /* Centraliza dentro do .menu-row */
+}
+
+.doom-btn.doom-desactive-btn {
+  color: #bbbbbb;
+  background: linear-gradient(180deg, #2a2a2a 0%, #151515 100%);
+  border: 6px ridge #4e4e4e;
+  border-radius: 4px;
+  padding: 12px 0;
+  width: 80%;
+  text-align: center;
+  font-family: "Impact", "Arial Black", sans-serif;
+  font-size: 1.3em;
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+  text-shadow: 2px 2px 2px #000;
+  cursor: pointer;
+  transition: all 0.1s ease;
+}
+
+/* Ajuste no container do menu para centralizar */
+.menu-actions {
+  align-items: center;
+}
+
+.menu-row {
+  justify-content: center;
+  margin: 10px 0;
+}
+
+/* Remove o efeito de pressionar que conflita com hover */
+button:active {
+  transform: translateY(1px);
 }
 
 @keyframes drip {

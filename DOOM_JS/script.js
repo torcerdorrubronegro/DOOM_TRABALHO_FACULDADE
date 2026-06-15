@@ -67,6 +67,8 @@ let explosaoAtiva = null;
 let offscreenCanvas, offscreenCtx;
 let municaoCartucho = 0;
 let kitMedico = 0;
+let itensColetados = 0;
+let bonus = 0
 // Elementos DOM
 const canvas = document.getElementById("doomCanvas");
 const doomFacePlayer = document.getElementById("doomFacePlayer");
@@ -77,7 +79,6 @@ const barraVida = document.getElementById("barraVida");
 const municaoContainer = document.getElementById("municaoContainer");
 const gunContainer = document.getElementById("gunContainer");
 const gunContent = document.getElementById("gunContent");
-const inimigosSpan = document.getElementById("inimigosRest");
 const gameoverScreen = document.getElementById("gameoverScreen");
 const actionButton = document.getElementById("actionButton");
 const quitButton = document.getElementById("quitButton");
@@ -89,7 +90,6 @@ const resumeButton = document.getElementById("resumeButton");
 const restartButton = document.getElementById("restartButton");
 const mainMenuButton = document.getElementById("mainMenuButton");
 const scoreValue = document.getElementById("score-value");
-const alvosValue = document.getElementById("alvos-value");
 const timeValue = document.getElementById("time-value");
 const tutorialContainer = document.getElementById("tutorialContainer");
 const tutorialCard = document.querySelectorAll(".tutorial-card");
@@ -99,7 +99,9 @@ const logArea = document.getElementById("logArea");
 const weaponArtImg = document.getElementById("weaponArtPanel");
 const bar = document.getElementById("ammoBarContainer");
 const label = document.getElementById("ammoLabel");
-
+const alvosRestantesSpan = document.getElementById("alvosRestantes");
+const kitMedicoSpan = document.getElementById("kitMedico");
+const cartuchosSpan = document.getElementById("cartuchos");
 const menuActions = document.getElementById("menuActions");
 const arrowActions = document.getElementById("arrowActions");
 const btnActions = menuActions.querySelectorAll("button");
@@ -360,10 +362,10 @@ function btnActionRender() {
 
   btnActions.forEach((b, index) => {
     if (btnActionIndex == index) {
-      b.classList.add("btn-active");
+      b.classList.remove("doom-desactive-btn");
       if (arrowSlots[index]) arrowSlots[index].appendChild(arrowIcon);
     } else {
-      b.classList.remove("btn-active");
+      b.classList.add("doom-desactive-btn");
     }
   });
 }
@@ -478,6 +480,7 @@ function atualizarSelecaoArma() {
       }
     });
   } else {
+    gunContent.innerHTML = "";
     Object.entries(ARMAS).forEach(([id]) => {
       const gunItem = document.createElement("div");
       gunItem.classList.add("gun-selected", "stat-text");
@@ -492,11 +495,11 @@ function atualizarSelecaoArma() {
 }
 atualizarSelecaoArma();
 
-function exibirArteArma(armaNum) {
-  if (armasArt[armaNum]) {
-    weaponArtImg.src = armasArt[armaNum];
+function exibirArteArma() {
+  if (armasArt[armaEquipada]) {
+    weaponArtImg.src = armasArt[armaEquipada];
     weaponArtImg.style.display = "block";
-    if (armaNum === 1) {
+    if (armaEquipada === 1) {
       weaponArtImg.style.objectFit = "contain";
     } else {
       weaponArtImg.style.objectFit = "cover";
@@ -522,13 +525,15 @@ function atualizarUI() {
   } else {
     vidaSpan.innerText = `${vida}%`;
   }
-  inimigosSpan.innerText = contadorInimigos;
   barraVida.style.width = vida + "%";
   if (vida <= 30 && vida > 0) {
     vidaSpan.style.animation = "pulseRed 0.5s ease-in-out infinite";
   } else {
     vidaSpan.style.animation = "";
   }
+  alvosRestantesSpan.innerText = contadorInimigos;
+  kitMedicoSpan.innerText = kitMedico;
+  cartuchosSpan.innerText = municaoCartucho;
 }
 
 function aplicarEfeitoDano() {
@@ -634,9 +639,24 @@ function resetarCronometro() {
 }
 
 function Pontuacao() {
-  const pontosPorInimigo = inimigosMortosFase * 100;
-  const tempoEmSegundos = tempoTotal;
-  pontuacao = Math.floor(pontosPorInimigo / tempoEmSegundos);
+  const pontosKill = inimigosMortosTotal * 100;
+  const pontosItens = itensColetados * 50;
+  let pontosTempo = 0;
+  if (tempoTotal > 0) {
+    pontosTempo = Math.max(50, Math.min(500, Math.floor(3000 / tempoTotal)));
+  } else {
+    pontosTempo = 500;
+  }
+  const pontosVida = Math.floor(vida * 2);
+  if (inimigosMortosTotal === 0 && itensColetados === 0) {
+    pontuacao = 0
+    return
+  }
+  pontuacao = pontosKill + pontosItens + pontosTempo + pontosVida + bonus;
+  addLog(
+    `Pontuação: ${pontosKill}(kills) + ${pontosItens}(itens) + ${pontosTempo}(tempo) + ${pontosVida}(vida) + ${bonus}(fase) = ${pontuacao}`,
+  );
+  return pontuacao;
 }
 
 function atualizarSangueNoRosto() {
@@ -684,28 +704,38 @@ function moverJogador(dx, dy) {
   let novaCelulaX = jogadorX + dx;
   let novaCelulaY = jogadorY + dy;
 
-  if (
-    novaCelulaX < 1 ||
-    novaCelulaX > mapX ||
-    novaCelulaY < 1 ||
-    novaCelulaY > mapY
-  ) {
-    return false;
+  const saida = fases[faseAtual].saida;
+  const ehSaida = novaCelulaX === saida.x && novaCelulaY === saida.y;
+
+  // Verifica limites do mapa (exceto se for a saída)
+  if (!ehSaida) {
+    if (
+      novaCelulaX < 1 ||
+      novaCelulaX > mapX ||
+      novaCelulaY < 1 ||
+      novaCelulaY > mapY
+    ) {
+      return false;
+    }
   }
 
   let tileDestino = mapa[novaCelulaX][novaCelulaY];
 
-  // impede jogador avançar
-  if (tileDestino === 5 || tileDestino === 1 || tileDestino === 3) {
+  // Permite entrar na saída (5), bloqueia paredes (1) e inimigos (3)
+  if (!ehSaida && (tileDestino === 1 || tileDestino === 3)) {
     return false;
   }
 
-  // Inicia movimento suave
+  // Se for saída, permite mesmo que tenha parede (a parede não deve estar na saída)
+  if (ehSaida && tileDestino !== 5) {
+    return false; // Segurança: se a saída não estiver marcada como 5, não entra
+  }
+
+  // Resto do código igual...
   isMoving = true;
   moveTargetX = novaCelulaX;
   moveTargetY = novaCelulaY;
 
-  // Limpa a posição atual (se não for saída)
   if (mapa[jogadorX][jogadorY] !== 5) {
     mapa[jogadorX][jogadorY] = 0;
   }
@@ -774,6 +804,7 @@ function verificarColetaItem(x, y) {
       // Aplica o efeito do item
       const config = ITENS_CONFIG[item.tipo];
       if (config && config.efeito) {
+        itensColetados++;
         config.efeito();
       }
 
@@ -831,35 +862,28 @@ function atirar() {
 
   // Executa o tiro após animação
   setTimeout(() => {
-    executarTiro(dirX, dirY, arma);
+    const tipoArma = arma.tipo || "normal";
+    switch (tipoArma) {
+      case "normal":
+        tiroNormal(dirX, dirY, arma);
+        animarFlashTiro(dirX, dirY, arma);
+        break;
+      case "penetrante":
+        tiroPenetrante(dirX, dirY, arma);
+        animarFlashTiro(dirX, dirY, arma);
+        break;
+      case "area":
+        tiroArea(dirX, dirY, arma);
+        break;
+      default:
+        tiroNormal(dirX, dirY, arma);
+        animarFlashTiro(dirX, dirY, arma);
+    }
   }, 50);
 
   atualizarInterfaceArmas();
   municao(armaEquipada, true);
   return true;
-}
-
-function executarTiro(dirX, dirY, arma) {
-  const tipoArma = arma.tipo || "normal";
-
-  switch (tipoArma) {
-    case "normal":
-      tiroNormal(dirX, dirY, arma);
-      animarFlashTiro(dirX, dirY, arma);
-
-      break;
-    case "penetrante":
-      tiroPenetrante(dirX, dirY, arma);
-      animarFlashTiro(dirX, dirY, arma);
-
-      break;
-    case "area":
-      tiroArea(dirX, dirY, arma);
-      break;
-    default:
-      tiroNormal(dirX, dirY, arma);
-      animarFlashTiro(dirX, dirY, arma);
-  }
 }
 
 // Tiro normal (Pistol, Shotgun)
@@ -1257,10 +1281,10 @@ function trocarArma(armaId) {
     addLog("Arma " + armaId + " nao existe");
     return false;
   }
-  if (ARMAS[armaId].municaoMax !== -1 && ARMAS[armaId].municaoAtual <= 0) {
-    addLog("Sem municao para " + ARMAS[armaId].nome);
-    return false;
-  }
+  // if (ARMAS[armaId].municaoMax !== -1 && ARMAS[armaId].municaoAtual <= 0) {
+  //   addLog("Sem municao para " + ARMAS[armaId].nome);
+  //   return false;
+  // }
   let nomeAntiga = ARMAS[armaEquipada].nome;
   armaEquipada = armaId;
   addLog("Troca de arma: " + nomeAntiga + " -> " + ARMAS[armaId].nome);
@@ -1270,7 +1294,7 @@ function trocarArma(armaId) {
       ? "infinita"
       : ARMAS[armaId].municaoAtual + "/" + ARMAS[armaId].municaoMax;
   addLog("Municao: " + munStr);
-  exibirArteArma(armaId);
+  exibirArteArma();
   atualizarInterfaceArmas();
   atualizarSelecaoArma();
   return true;
@@ -1606,17 +1630,6 @@ function desenharMapa() {
     }
   }
 
-  function atualizarCelulaOffscreen(x, y) {
-    if (!offscreenCtx) return;
-    let px = (x - 1) * CELL_W;
-    let py = (y - 1) * CELL_H;
-    // Redesenha o chão padrão
-    offscreenCtx.fillStyle = "#120e0a";
-    offscreenCtx.fillRect(px, py, CELL_W - 1, CELL_H - 1);
-    offscreenCtx.fillStyle = "#2f2a1f";
-    offscreenCtx.fillRect(px + 1, py + 1, CELL_W - 3, CELL_H - 3);
-  }
-
   // 3. DESENHA INIMIGOS VIVOS + BARRA DE VIDA
   for (let i = 0; i < inimigos.length; i++) {
     let inv = inimigos[i];
@@ -1757,11 +1770,19 @@ function desenharMapa() {
   ctx.strokeRect(0, 0, canvaW, canvaH);
   canvas.style.cursor = "crosshair";
 }
-function carregarFase(fase) {
-  // Reseta flags específicas da fase
-  temKeycard = false;
-  bossMorto = false;
 
+function atualizarCelulaOffscreen(x, y) {
+  if (!offscreenCtx) return;
+  let px = (x - 1) * CELL_W;
+  let py = (y - 1) * CELL_H;
+  // Redesenha o chão padrão
+  offscreenCtx.fillStyle = "#120e0a";
+  offscreenCtx.fillRect(px, py, CELL_W - 1, CELL_H - 1);
+  offscreenCtx.fillStyle = "#2f2a1f";
+  offscreenCtx.fillRect(px + 1, py + 1, CELL_W - 3, CELL_H - 3);
+}
+
+function carregarFase(fase) {
   // Limpar mapa
   for (let x = 1; x <= mapX; x++) {
     for (let y = 1; y <= mapY; y++) {
@@ -1823,7 +1844,7 @@ function carregarFase(fase) {
 
   // ===== INIMIGOS =====
   contadorInimigos = dados.inimigos.length;
-  inimigosMortosFase = 0;
+  inimigosMortosFase=0
   inimigos = [];
 
   dados.inimigos.forEach((inimigoConfig, index) => {
@@ -1837,10 +1858,6 @@ function carregarFase(fase) {
     if (mapa[novoInimigo.x][novoInimigo.y] !== 5) {
       mapa[novoInimigo.x][novoInimigo.y] = 3;
     }
-
-    if (novoInimigo.isBoss) {
-      addLog(`⚠️ BARÃO DO INFERNO AVISTADO! VIDA: ${novoInimigo.hp} ⚠️`);
-    }
   });
 
   atualizarUI();
@@ -1850,7 +1867,8 @@ function carregarFase(fase) {
 
 function exibirTelaFim(config) {
   pararCronometro();
-  if (typeof Pontuacao === "function") Pontuacao(); // Atualiza a pontuação global
+
+  Pontuacao(); // Atualiza a pontuação global
 
   // 1. Configura textos e cores personalizados
   gameoverTitle.innerText = config.titulo;
@@ -1868,12 +1886,8 @@ function exibirTelaFim(config) {
   const dadosFase = fases[faseAtual];
   const totalInimigosFase = dadosFase ? dadosFase.inimigos.length : 6;
 
-  alvosValue.innerText = `${faseAtual === Object.keys(fases).length ? inimigosMortosTotal : inimigosMortosFase}/${inimigosMortosTotal}`;
-  timeValue.innerText = formatarTempo(tempoTotal);
-
-  // 4. Animação do Score subindo (Otimizada para não demorar muito se o score for alto)
-  scoreValue.innerText = "0";
   gameoverScreen.classList.add("show");
+  timeValue.innerText = formatarTempo(tempoTotal);
 
   setTimeout(() => {
     let i = 0;
@@ -1901,28 +1915,29 @@ function verificarSaida(x, y) {
   const totalInimigosFase = dados.inimigos.length;
   console.log(faseAtual, Object.keys(fases).length);
   // Verifica se está na posição da saída
-  if (x == 19 && y == 8) {
+  if (x == 20 && y == 8) {
     if (inimigosMortosFase < totalInimigosFase) {
       addLog("ACESSO NEGADO!");
       return;
     }
     addLog("SAÍDA ENCONTRADA! VOCÊ COMPLETOU A FASE!");
     inimigosMortosTotal += inimigosMortosFase;
-    exibirTelaFim({
-      titulo: "Fase Completa!",
-      cor: "#00f5d4",
-      textoBotao: "Próxima Fase",
-      acaoBotao: () => {
-        if (faseAtual === Object.keys(fases).length) {
-          finalizarJogo(true); // Vitória final
-        } else {
+    if (faseAtual === Object.keys(fases).length) {
+      finalizarJogo(true); // Vitória final
+    } else {
+      exibirTelaFim({
+        titulo: "Fase Completa!",
+        cor: "#00f5d4",
+        textoBotao: "Próxima Fase",
+        acaoBotao: () => {
           faseAtual++;
+          bonus+=100
           carregarFase(faseAtual);
           iniciarCronometro();
           moverDemonios();
-        }
-      },
-    });
+        },
+      });
+    }
   }
 }
 function finalizarJogo(vitoria) {
@@ -1961,9 +1976,9 @@ function finalizarJogo(vitoria) {
 }
 
 function inicializarJogo() {
-  resetarCronometro();
+  if (faseAtual === 1) resetarCronometro();
   iniciarCronometro();
-  pontuacao = 0;
+  pontuacao = pontuacao;
   vida = 100;
   inimigosMortosFase = 0;
   contadorInimigos = 6;
@@ -1981,13 +1996,12 @@ function inicializarJogo() {
   doomFacePlayer.style.display = "flex";
   municao(null, false);
   atualizarBarraMunicaoHTML();
-  armaEquipada = 1;
   ultimoTiro = 0;
   direcaoAtual = "w";
-  exibirArteArma(1);
+  exibirArteArma();
   atualizarInterfaceArmas();
   atualizarSelecaoArma();
-  carregarFase(1);
+  carregarFase(faseAtual);
   atualizarUI();
   desenharMapa();
   if (intervaloMovimento) clearInterval(intervaloMovimento);
@@ -2030,27 +2044,43 @@ function voltarAoMenuPrincipal() {
   menuInicial.style.display = "flex";
   doomTitle.style.display = "flex";
 
-  // Reseta flags do jogo
+  // ✅ RESETA VARIÁVEIS DO JOGO
+  faseAtual = 1;
+  armaEquipada = 1;
   jogoAtivo = false;
   esperandoInput = false;
   etapaAtual = "menu";
   btnActionIndex = 0;
+  municaoCartucho = 0;
+  kitMedico = 0;
+  vida = 100; // Também reseta a vida!
+  pontuacao = 0; // Reseta pontuação
+
+  // ✅ RESETA AS MUNIÇÕES DAS ARMAS (CORRIGIDO)
+  Object.entries(ARMAS).forEach(([id, arma]) => {
+    switch (parseInt(id)) {
+      case 1:
+        arma.municaoAtual = 50;
+        break;
+      case 2:
+        arma.municaoAtual = 8;
+        break;
+      case 3:
+        arma.municaoAtual = 50;
+        break;
+      case 4:
+        arma.municaoAtual = 3;
+        break;
+    }
+  });
+
   btnActionRender();
 
-  // Opcional: limpar o canvas para não mostrar o último frame
+  // Limpar o canvas
   ctx.clearRect(0, 0, canvaW, canvaH);
-
-  // ✅ GARANTE QUE O LOG ESTÁ LIMPO
   logArea.innerHTML = "";
 }
-// function resetarInfoBar() {
-// Reseta valores da UI
-//   vidaSpan.innerText = "100%";
-//   barraVida.style.width = "100%";
-//   inimigosSpan.innerText = "6";
-//   // Reseta animações
-//   vidaSpan.style.animation = "";
-// }
+
 function renderTutorialCard() {
   tutorialContainer.style.display = "flex";
 
@@ -2086,7 +2116,7 @@ function renderTutorialCard() {
     }
   });
 
-  if (tutorialCardIndex == 5) {
+  if (tutorialCardIndex === 6) {
     btnProceed.innerText = "Começar jogo";
   } else {
     btnProceed.textContent = "Próximo";
@@ -2133,7 +2163,6 @@ function handleKeyDown(e) {
       return;
     } else if (key === "h" || key === "H") {
       usarKitMedico();
-      console.log(vida);
       return;
     }
   }
@@ -2192,32 +2221,50 @@ function recarregarMunicao() {
   let arma = ARMAS[armaEquipada];
   if (arma.municaoAtual < arma.municaoMax && municaoCartucho > 0) {
     if (arma.municaoMax !== -1) {
-      let quantidade = Math.floor(arma.municaoMax * 0.25);
-      arma.municaoAtual = Math.min(
-        arma.municaoMax,
-        arma.municaoAtual + quantidade,
-      );
+      const quantidade = 10
+      arma.municaoAtual = Math.min(arma.municaoMax, arma.municaoAtual + quantidade);
       addLog(`+${quantidade} munição para ${arma.nome}!`);
       atualizarInterfaceArmas();
-      municao();
+      municao(armaEquipada, true);
       municaoCartucho--;
     }
   }
 }
 
+function mostrarBonus(texto, cor = "#2ecc2e") {
+  const span = document.createElement("span");
+  span.textContent = texto;
+  span.style.position = "fixed";
+  span.style.left = "50%";
+  span.style.bottom = "30%";
+  span.style.transform = "translateX(-50%)";
+  span.style.color = cor;
+  span.style.fontFamily = "Press Start 2P";
+  span.style.fontSize = "1.2rem";
+  span.style.textShadow = "2px 2px 0 #000";
+  span.style.zIndex = "9999";
+  span.style.pointerEvents = "none";
+  span.style.animation = "floatUp 0.8s ease-out forwards";
+  document.body.appendChild(span);
+  setTimeout(() => span.remove(), 800);
+}
+
 function usarKitMedico() {
   if (vida < 100 && kitMedico > 0) {
     vida += 20;
-    atualizarUI()
-    const efeito = document.createElement("div")
-    efeito.classList.add("vidaEfeito")
-    document.body.appendChild(efeito)
+    document.body.classList.add("curando");
+    doomFacePlayer.classList.add("health");
+    mostrarBonus("+20", "#2ecc2e");
     setTimeout(() => {
-      efeito.classList.remove("vidaEfeito")
-    }, 500);
+      document.body.classList.remove("curando");
+      doomFacePlayer.classList.remove("health");
+    }, 1000);
+    kitMedico--;
     if (vida > 100) {
-      vidaJogador = 100; 
+      vida = 100;
     }
+    atualizarSangueNoRosto();
+    atualizarUI();
   }
 }
 
@@ -2275,7 +2322,7 @@ document.addEventListener("keydown", (e) => {
           loadImages();
           break;
         case "tutorial":
-          if (tutorialCardIndex == 5) {
+          if (tutorialCardIndex == 6) {
             renderIntro();
           } else {
             tutorialCardIndex++;
@@ -2421,7 +2468,7 @@ btnBack.addEventListener("click", () => {
 });
 
 btnProceed.addEventListener("click", () => {
-  if (tutorialCardIndex == 5) {
+  if (tutorialCardIndex == 6) {
     etapaAtual = "intro";
     introCharacterContainer.style.display = "flex";
     tutorialContainer.style.display = "none";
@@ -2433,10 +2480,6 @@ btnProceed.addEventListener("click", () => {
 
 function reiniciarFaseAtual() {
   gameoverScreen.classList.remove("show");
-  jogoAtivo = true;
-  esperandoInput = false;
-  pontuacao = 0;
-
   inicializarJogo();
 }
 canvas.addEventListener("mousemove", (e) => {
@@ -2457,6 +2500,12 @@ canvas.addEventListener("mousemove", (e) => {
   if (len > 0.001) {
     miraVetor.x = dx / len;
     miraVetor.y = dy / len;
+  }
+});
+canvas.addEventListener("mousedown", (e) => {
+  if (e.button == 0) {
+    atirar();
+    e.preventDefault();
   }
 });
 window.addEventListener("keydown", handleKeyDown);

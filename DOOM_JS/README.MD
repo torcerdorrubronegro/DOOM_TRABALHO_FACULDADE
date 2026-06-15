@@ -3,11 +3,11 @@ DOOM JS - Recriação do clássico de 1993
 Sobre o projeto
 
 Este projeto é uma recriação fan-made do jogo DOOM (1993) da id Software, desenvolvida inteiramente em HTML5 Canvas, CSS3 e JavaScript puro. O objetivo é trazer a jogabilidade essencial do clássico para o navegador, mantendo a estética retrô e a brutalidade característica. O jogador controla um fuzileiro espacial que deve eliminar demônios, coletar munição, explorar fases e encontrar a saída de cada nível.
-Este projeto faz parte do trabalho da disciplina de Algoritmo e Estrutura de Dados, feito por uma equipe de 3 integrantes e com ajudo do professsor Maxwell.
+Este projeto faz parte do trabalho da disciplina de Algoritmo e Estrutura de Dados, feito por uma equipe de 3 integrantes e com ajuda do professsor e orientador Maxwell Gomes.
 
 Funcionalidades
 
-- Movimentação suave em grade com animação entre células.
+- Movimentação wasd tipico de jogos de PC.
 - Quatro armas diferentes: Pistola, Espingarda, Metralhadora e Lança-foguetes, cada uma com estatísticas próprias, munição limitada e efeitos visuais.
 - Inimigos com inteligência artificial simples que perseguem o jogador e atacam ao encostar.
 - Sistema de dano por projétil, incluindo tiro normal, penetrante (Metralhadora) e de área (Lança-foguetes).
@@ -16,7 +16,7 @@ Funcionalidades
 - Mira controlada pelo mouse para apontar os disparos.
 - HUD detalhado com indicadores de vida, munição por arma, inimigos restantes, console de eventos e objetivo dinâmico.
 - Tutorial interativo que explica movimentação, arsenal, interface e exploração.
-- Menus e telas de fim de fase com estatísticas de desempenho (pontuação, tempo, alvos abatidos).
+- Menus e telas de fim de fase com estatísticas de desempenho (pontuação, tempo, itens coletados).
 
 Como jogar
 
@@ -32,7 +32,7 @@ Movimentar:
 - A ou Seta para esquerda: anda para esquerda
 - D ou Seta para direita: anda para direita
 
-Atirar: barra de espaço
+Atirar: barra de espaço ou clique na direção do tiro
 
 Trocar arma:
 - Tecla 1: Pistola
@@ -42,28 +42,23 @@ Trocar arma:
 
 Mirar: mover o mouse dentro da área do canvas
 
-Reiniciar (após morrer): tecla R
-
 Pause da partida atual: tecla Q
+
+Usar kit médico: tecla H
+
+Recarregar Munição: telcla R
 
 Mecânicas importantes
 
 - Vida: inicia com 100%. Receber dano de inimigos reduz a vida. Quando a vida fica abaixo de 30%, a barra pisca e o rosto do personagem fica ensanguentado.
-- Munição: cada arma possui um estoque máximo e um estoque atual. Caixas de munição espalhadas pelo mapa recarregam 30% da capacidade máxima da arma equipada no momento.
-- Inimigos: cada demônio tem sua própria barra de vida e se move em direção ao jogador a cada 0,5 segundo. Ao encostar, causam dano (20 pontos para inimigos normais, 30 para o chefe).
+- Munição: cada arma possui um estoque máximo e um estoque atual. Caixas de munição espalhadas pelo mapa recarregam 25% da capacidade máxima da arma equipada no momento.
+- Inimigos: cada demônio tem sua própria barra de vida e se move em direção ao jogador a cada 0,5 segundo. Ao encostar, causam dano ao jogador.
 - Explosões: o Lança-foguetes causa dano em área, podendo destruir paredes próximas e acertar vários inimigos de uma vez.
 - Console de eventos: localizado na lateral direita, exibe mensagens em tempo real sobre dano, mortes, troca de armas, coleta de itens e liberação de saída.
 
 Fases
 
-Fase 1
-Mapa introdutório com seis inimigos distribuídos nos cantos, algumas paredes internas e quatro caixas de munição. Saída no lado direito.
-
-Fase 2
-Mapa com labirinto, seis inimigos espalhados, mais paredes bloqueando caminhos e itens de munição em locais estratégicos.
-
-Fase 3
-Última fase e quatro demônios de apoio. Paredes formam uma área octogonal com pilares para cobertura. Seis caixas de munição estão disponíveis.
+Três fases com um mapa 20x15. Cada mapa possui uma estrutura diferente, inimigos espalhados por ele e itens (cartuchos de munição e kit médico) espalhados pelo mapa. A fase termina quando o jogador chega a saída.
 
 Tecnologias utilizadas
 
