@@ -480,12 +480,7 @@ body::after {
     justify-content: center;
 
     .tutorial-card {
-      background: repeating-linear-gradient(
-        135deg,
-        color-mix(in srgb, var(--steel-dark) 95%, transparent) 0px,
-        color-mix(in srgb, var(--abyss-black) 5%, transparent) 2px,
-        color-mix(in srgb, var(--steel-dark) 95%, transparent) 15px
-      );
+      background: var(--steel-dark);
       box-shadow: 3px 3px 15px rgba(0, 0, 0, 0.6);
       box-sizing: border-box;
       border-radius: 6px;
@@ -497,13 +492,12 @@ body::after {
       flex-direction: column;
 
       &.movimentacao {
-        width: 600px;
+        min-width: 600px;
         height: 255px;
       }
 
       &.mecanicas {
-        width: 560px;
-        height: 365px;
+        min-width: 560px;
       }
 
       &.armas {
@@ -676,18 +670,22 @@ body::after {
         }
 
         .arrow-info {
-          gap: 6px;
+          gap: 30px;
           flex: 1;
           padding-left: 1em;
-          display: grid;
-          grid-template-columns: 1fr 1fr;
-          width: 100%;
+          display: flex;
+          align-items: center;
+          justify-content: space-around;
 
           .highlight-note {
-            font-size: 0.65em;
-            color: var(--fire-orange);
+            font-size: .9em;
+            font-family: "Science Gothic";
             margin-top: 5px;
             text-shadow: 1px 1px 0 var(--abyss-black);
+
+            strong {
+              color: var(--fire-orange);
+            }
           }
         }
 
@@ -785,17 +783,17 @@ body::after {
         &.mechanics-layout {
           flex-direction: column;
           gap: 12px;
+          padding: 2em .5em;
           justify-content: center;
 
           .mechanic-row {
             display: flex;
             align-items: center;
             gap: 15px;
-            background: rgba(0, 0, 0, 0.5);
+            background: var(--abyss-black);
             padding: 8px;
             border-radius: 4px;
             width: 100%;
-            max-height: 140px;
 
             p {
               white-space: wrap;

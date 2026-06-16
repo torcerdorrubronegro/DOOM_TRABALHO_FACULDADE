@@ -68,7 +68,8 @@ let offscreenCanvas, offscreenCtx;
 let municaoCartucho = 0;
 let kitMedico = 0;
 let itensColetados = 0;
-let bonus = 0
+let bonus = 0;
+let municaoSnapshotFase = {};
 // Elementos DOM
 const canvas = document.getElementById("doomCanvas");
 const doomFacePlayer = document.getElementById("doomFacePlayer");
@@ -349,14 +350,12 @@ function btnActionRender() {
   if (btnActionIndex < 0) btnActionIndex = 2;
   if (btnActionIndex > 2) btnActionIndex = 0;
 
-  // Busca os novos slots alinhados por linha
   let arrowSlots = menuActions.querySelectorAll(".arrow-slot");
 
   arrowSlots.forEach((slot) => {
     slot.innerHTML = "";
   });
 
-  // Procure essa linha na sua função btnActionRender() e altere para:
   let arrowIcon = document.createElement("i");
   arrowIcon.classList.add("fa-solid", "fa-angles-right"); // Usa seta dupla pontuda estilo Doom
 
@@ -494,6 +493,24 @@ function atualizarSelecaoArma() {
   }
 }
 atualizarSelecaoArma();
+
+function salvarSnapshotMunicao() {
+  Object.entries(ARMAS).forEach(([id, arma]) => {
+    municaoSnapshotFase[id] = arma.municaoAtual;
+  });
+  municaoSnapshotFase._cartuchos = municaoCartucho;
+  municaoSnapshotFase._kitMedico = kitMedico;
+  municaoSnapshotFase._itensColetados = itensColetados;
+}
+
+function restaurarSnapshotMunicao() {
+  Object.entries(ARMAS).forEach(([id, arma]) => {
+    arma.municaoAtual = municaoSnapshotFase[id] ?? arma.municaoAtual;
+  });
+  municaoCartucho = municaoSnapshotFase._cartuchos ?? municaoCartucho;
+  kitMedico = municaoSnapshotFase._kitMedico ?? kitMedico;
+  itensColetados = municaoSnapshotFase._itensColetados ?? itensColetados;
+}
 
 function exibirArteArma() {
   if (armasArt[armaEquipada]) {
@@ -649,8 +666,8 @@ function Pontuacao() {
   }
   const pontosVida = Math.floor(vida * 2);
   if (inimigosMortosTotal === 0 && itensColetados === 0) {
-    pontuacao = 0
-    return
+    pontuacao = 0;
+    return;
   }
   pontuacao = pontosKill + pontosItens + pontosTempo + pontosVida + bonus;
   addLog(
@@ -1844,8 +1861,9 @@ function carregarFase(fase) {
 
   // ===== INIMIGOS =====
   contadorInimigos = dados.inimigos.length;
-  inimigosMortosFase=0
+  inimigosMortosFase = 0;
   inimigos = [];
+  salvarSnapshotMunicao();
 
   dados.inimigos.forEach((inimigoConfig, index) => {
     const novoInimigo = criarInimigo(index, inimigoConfig.x, inimigoConfig.y, {
@@ -1931,7 +1949,7 @@ function verificarSaida(x, y) {
         textoBotao: "Próxima Fase",
         acaoBotao: () => {
           faseAtual++;
-          bonus+=100
+          bonus += 100;
           carregarFase(faseAtual);
           iniciarCronometro();
           moverDemonios();
@@ -1978,6 +1996,7 @@ function finalizarJogo(vitoria) {
 function inicializarJogo() {
   if (faseAtual === 1) resetarCronometro();
   iniciarCronometro();
+  restaurarSnapshotMunicao();
   pontuacao = pontuacao;
   vida = 100;
   inimigosMortosFase = 0;
@@ -2051,10 +2070,12 @@ function voltarAoMenuPrincipal() {
   esperandoInput = false;
   etapaAtual = "menu";
   btnActionIndex = 0;
-  municaoCartucho = 0;
-  kitMedico = 0;
   vida = 100; // Também reseta a vida!
   pontuacao = 0; // Reseta pontuação
+  municaoCartucho = 0;
+  kitMedico = 0;
+  itensColetados = 0;
+  municaoSnapshotFase = {}; // ✅
 
   // ✅ RESETA AS MUNIÇÕES DAS ARMAS (CORRIGIDO)
   Object.entries(ARMAS).forEach(([id, arma]) => {
@@ -2221,8 +2242,11 @@ function recarregarMunicao() {
   let arma = ARMAS[armaEquipada];
   if (arma.municaoAtual < arma.municaoMax && municaoCartucho > 0) {
     if (arma.municaoMax !== -1) {
-      const quantidade = 10
-      arma.municaoAtual = Math.min(arma.municaoMax, arma.municaoAtual + quantidade);
+      const quantidade = 10;
+      arma.municaoAtual = Math.min(
+        arma.municaoMax,
+        arma.municaoAtual + quantidade,
+      );
       addLog(`+${quantidade} munição para ${arma.nome}!`);
       atualizarInterfaceArmas();
       municao(armaEquipada, true);
