@@ -485,7 +485,6 @@ function atualizarSelecaoArma() {
       gunItem.classList.add("gun-selected", "stat-text");
       gunItem.innerText = id;
       gunContent.appendChild(gunItem);
-      console.log(gunItem);
     });
     const armasLength = Object.keys(ARMAS).length;
     gunContainer.querySelector("p.gun-description").innerText =
@@ -604,7 +603,6 @@ function atualizarBarraMunicaoHTML() {
   if (!label || !fill) return;
 
   bar.style.display = "flex";
-  console.log(arma.municaoAtual);
   if (arma.municaoMax === -1) {
     label.innerText = arma.nome + ": INFINITA";
     fill.style.width = "100%";
@@ -838,7 +836,6 @@ function verificarColetaItem(x, y) {
 
 function atirar() {
   if (!jogoAtivo) {
-    console.log("Jogo não está ativo");
     return false;
   }
 
@@ -1046,7 +1043,6 @@ function tiroArea(dirX, dirY, arma) {
 }
 
 function animarProjetilArea(dirX, dirY, alvoX, alvoY, arma) {
-  console.log("projetil indo para", alvoX, alvoY);
   let startX = (jogadorX - 1) * CELL_W + CELL_W / 2;
   let startY = (jogadorY - 1) * CELL_H + CELL_H / 2;
   let endX = (alvoX - 1) * CELL_W + CELL_W / 2;
@@ -1133,7 +1129,6 @@ function animarProjetilArea(dirX, dirY, alvoX, alvoY, arma) {
       rastro: [...rastro],
     };
 
-    // desenharMapa();
   }, 35);
 }
 function calcularDanoArma() {
@@ -1171,8 +1166,7 @@ function criarExplosaoRealistica(x, y) {
   const anim = setInterval(() => {
     if (!jogoAtivo || frames >= maxFrames) {
       clearInterval(anim);
-      explosaoAtiva = null; // Desativa a explosão
-      // desenharMapa();
+      explosaoAtiva = null;
       return;
     }
 
@@ -1210,7 +1204,6 @@ function criarExplosaoRealistica(x, y) {
     };
 
     frames++;
-    // desenharMapa();
   }, 50);
 }
 function desenharFlashTiro() {
@@ -1879,7 +1872,6 @@ function carregarFase(fase) {
   });
 
   atualizarUI();
-  desenharMapa();
   renderizarMapaEstatico();
 }
 
@@ -1928,10 +1920,8 @@ function exibirTelaFim(config) {
 function verificarSaida(x, y) {
   const dados = fases[faseAtual];
   if (!dados) return;
-
-  Object.values(fases).map((f) => f.inimigos.length);
   const totalInimigosFase = dados.inimigos.length;
-  console.log(faseAtual, Object.keys(fases).length);
+
   // Verifica se está na posição da saída
   if (x == 20 && y == 8) {
     if (inimigosMortosFase < totalInimigosFase) {
@@ -1990,7 +1980,6 @@ function finalizarJogo(vitoria) {
       },
     });
   }
-  desenharMapa();
 }
 
 function inicializarJogo() {
@@ -2022,7 +2011,6 @@ function inicializarJogo() {
   atualizarSelecaoArma();
   carregarFase(faseAtual);
   atualizarUI();
-  desenharMapa();
   if (intervaloMovimento) clearInterval(intervaloMovimento);
   moverDemonios();
   if (animationId) cancelAnimationFrame(animationId);
@@ -2032,52 +2020,48 @@ function inicializarJogo() {
 quitButton.addEventListener("click", voltarAoMenuPrincipal);
 
 function voltarAoMenuPrincipal() {
-  // Cancela animação
+
   if (animationId) {
     cancelAnimationFrame(animationId);
     animationId = null;
   }
-  // Para movimentos dos inimigos
   if (intervaloMovimento) {
     clearInterval(intervaloMovimento);
     intervaloMovimento = null;
   }
-  // Para cronômetro
   if (intervaloRelogio) {
     clearInterval(intervaloRelogio);
     intervaloRelogio = null;
   }
 
-  // Esconde elementos do jogo
   gameoverScreen.classList.remove("show");
   canvas.style.display = "none";
   logArea.style.display = "none";
   weaponArtImg.style.display = "none";
   bar.style.display = "none";
   doomFacePlayer.style.display = "none";
+
   for (let chave in imagens) {
     imagens[chave] = null;
   }
+
   imagensCarregadas = 0;
   gameContainer.style.display = "none";
   menuInicial.style.display = "flex";
   doomTitle.style.display = "flex";
-
-  // ✅ RESETA VARIÁVEIS DO JOGO
   faseAtual = 1;
   armaEquipada = 1;
   jogoAtivo = false;
   esperandoInput = false;
   etapaAtual = "menu";
   btnActionIndex = 0;
-  vida = 100; // Também reseta a vida!
-  pontuacao = 0; // Reseta pontuação
+  vida = 100; 
+  pontuacao = 0; 
   municaoCartucho = 0;
   kitMedico = 0;
   itensColetados = 0;
-  municaoSnapshotFase = {}; // ✅
+  municaoSnapshotFase = {};
 
-  // ✅ RESETA AS MUNIÇÕES DAS ARMAS (CORRIGIDO)
   Object.entries(ARMAS).forEach(([id, arma]) => {
     switch (parseInt(id)) {
       case 1:
@@ -2097,7 +2081,6 @@ function voltarAoMenuPrincipal() {
 
   btnActionRender();
 
-  // Limpar o canvas
   ctx.clearRect(0, 0, canvaW, canvaH);
   logArea.innerHTML = "";
 }
@@ -2231,11 +2214,8 @@ function handleKeyDown(e) {
   }
   if (moved) {
     atualizarUI();
-    desenharMapa();
     if (vida <= 0) finalizarJogo(false);
-  } else if (key.startsWith("Arrow")) {
-    desenharMapa();
-  }
+  } 
 }
 
 function recarregarMunicao() {
@@ -2533,22 +2513,3 @@ canvas.addEventListener("mousedown", (e) => {
   }
 });
 window.addEventListener("keydown", handleKeyDown);
-
-// estilos dinamicos (keyframes)
-const styleSheet = document.createElement("style");
-styleSheet.textContent = `
-        @keyframes damageNumber {
-          0% { transform: scale(1); color: #f0e6a0; }
-          50% { transform: scale(1.3); color: #ff0000; text-shadow: 0 0 5px rgba(255,0,0,0.8); }
-          100% { transform: scale(1); color: #f0e6a0; }
-        }
-        @keyframes pulseRed {
-          0%,100% { color: #f0e6a0; text-shadow: 0 0 0px rgba(255,0,0,0); }
-          50% { color: #ff0000; text-shadow: 0 0 10px rgba(255,0,0,0.8); }
-        }
-        @keyframes floatBlood {
-          0% { transform: translate(0,0) scale(1); opacity: 1; }
-          100% { transform: translate(50px,-50px) scale(0); opacity: 0; }
-        }
-      `;
-document.head.appendChild(styleSheet);

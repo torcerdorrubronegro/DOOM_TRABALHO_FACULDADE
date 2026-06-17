@@ -1,3 +1,4 @@
+@charset "UTF-8";
 @import url("https://fonts.googleapis.com/css2?family=DotGothic16&display=swap");
 @import url("https://fonts.googleapis.com/css2?family=Jersey+25&family=Michroma&family=Press+Start+2P&family=Science+Gothic:wght@100..900&display=swap");
 
@@ -678,13 +679,13 @@ body::after {
           justify-content: space-around;
 
           .highlight-note {
-            font-size: .9em;
-            font-family: "Science Gothic";
+            font-size: 0.9em;
+            font-family: "Arial", sans-serif;
             margin-top: 5px;
             text-shadow: 1px 1px 0 var(--abyss-black);
 
             strong {
-              color: var(--fire-orange);
+              color: var(--doom-gold);
             }
           }
         }
@@ -783,7 +784,7 @@ body::after {
         &.mechanics-layout {
           flex-direction: column;
           gap: 12px;
-          padding: 2em .5em;
+          padding: 2em 0.5em;
           justify-content: center;
 
           .mechanic-row {
@@ -831,7 +832,6 @@ body::after {
               align-items: center;
               justify-content: center;
               font-size: 1.1em;
-              color: #ffcc00;
               border-radius: 4px;
               flex-shrink: 0;
 
@@ -922,10 +922,6 @@ body::after {
               &.highlight-red {
                 color: #ff3d00;
               }
-
-              &.highlight-yellow {
-                color: #ffcc00;
-              }
             }
 
             .hud-face {
@@ -970,7 +966,6 @@ body::after {
           p {
             font-family: "Press Start 2P", monospace;
             font-size: 0.62em;
-            color: #ffcc00;
             margin: 0;
           }
 
@@ -1818,10 +1813,8 @@ body::after {
   background: rgba(255, 0, 0, 0.1);
 }
 
-.console-area div:contains("pegou"),
-.console-area div:contains("Munição") {
+.console-area div:contains("pegou") {
   border-left-color: #ffaa00;
-  color: #ffcc44;
   text-shadow: 0 0 3px #ffaa00;
 }
 
@@ -2342,5 +2335,28 @@ button:active {
 
   100% {
     background-position: 0 20px;
+  }
+}
+
+@keyframes pulseRed {
+  0%,
+  100% {
+    color: #f0e6a0;
+    text-shadow: 0 0 0px rgba(255, 0, 0, 0);
+  }
+  50% {
+    color: #ff0000;
+    text-shadow: 0 0 10px rgba(255, 0, 0, 0.8);
+  }
+}
+
+@keyframes floatBlood {
+  0% {
+    transform: translate(0, 0) scale(1);
+    opacity: 1;
+  }
+  100% {
+    transform: translate(50px, -50px) scale(0);
+    opacity: 0;
   }
 }
